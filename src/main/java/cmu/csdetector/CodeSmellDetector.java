@@ -4,16 +4,16 @@ import cmu.csdetector.console.ToolParameters;
 import cmu.csdetector.console.output.ObservableExclusionStrategy;
 import cmu.csdetector.metrics.MethodMetricValueCollector;
 import cmu.csdetector.metrics.TypeMetricValueCollector;
-import cmu.csdetector.smells.ClassLevelSmellDetector;
-import cmu.csdetector.smells.MethodLevelSmellDetector;
-import cmu.csdetector.smells.Smell;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import cmu.csdetector.resources.Method;
 import cmu.csdetector.resources.Type;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
 import cmu.csdetector.resources.loader.SourceFile;
 import cmu.csdetector.resources.loader.SourceFilesLoader;
+import cmu.csdetector.smells.ClassLevelSmellDetector;
+import cmu.csdetector.smells.MethodLevelSmellDetector;
+import cmu.csdetector.smells.Smell;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.cli.ParseException;
 
 import java.io.BufferedWriter;
@@ -26,7 +26,7 @@ import java.util.List;
 
 public class CodeSmellDetector {
 
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         CodeSmellDetector instance = new CodeSmellDetector();
 
         instance.start(args);
@@ -60,11 +60,11 @@ public class CodeSmellDetector {
     }
 
     private void detectSmells(List<Type> allTypes) {
-        for(Type type : allTypes) {
+        for (Type type : allTypes) {
             // It is important to detect certain smells at method level first, such as Brain Method
             MethodLevelSmellDetector methodLevelSmellDetector = new MethodLevelSmellDetector();
 
-            for(Method method : type.getMethods()) {
+            for (Method method : type.getMethods()) {
                 List<Smell> smells = methodLevelSmellDetector.detect(method);
                 method.addAllSmells(smells);
             }
@@ -99,7 +99,7 @@ public class CodeSmellDetector {
     }
 
     private void collectMethodMetrics(Type type) {
-        for (Method method: type.getMethods()) {
+        for (Method method : type.getMethods()) {
             MethodMetricValueCollector methodCollector = new MethodMetricValueCollector();
             methodCollector.collect(method);
         }
