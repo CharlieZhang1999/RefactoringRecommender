@@ -8,60 +8,69 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Visit a method body to find all accessed fields from the method in the class
- * During simple name visit, this current visitor will use binding to determine if the simple name
- * correspond to a field or not. If the simple name refers to a variable, the visitor will check if the
- * variable is local or class field
+ * Visits a method body in order to find all accesses class fields. During
+ * SimpleName visits, this visitor uses binding to determine if the simple name refers
+ * to a field or not. If the simple name refers to a field, the visitor checks if the field
+ * belongs to the class
+ *
+ * @author leonardo
  */
-
 public class ClassFieldAccessCollector extends CollectorVisitor<IVariableBinding> {
-    /**
-     * Represent the Type that declares the method being visited
-     */
-    private ITypeBinding declareTypeBinding;
-    private Set<IVariableBinding> allVariables;
 
-    public ClassFieldAccessCollector(TypeDeclaration typeDeclaration){
-        this.declareTypeBinding = typeDeclaration.resolveBinding();
-        this.allVariables = this.getVariablesHierarchy();
-    }
+	/**
+	 * Type that declares the method being visited
+	 */
+	protected final ITypeBinding declaringTypeBinding;
 
-    @Override
-    public boolean visit(SimpleName node) {
-        // logic to check if the node correspond to a variable, if so, check if the node is a field in class
+	private Set<IVariableBinding> allVariables;
 
-        if (this.declareTypeBinding == null){
-            return false; // means don't compute anything
-        }
-        IBinding binding = node.resolveBinding();
-        if(binding == null){
-            return false;
-        }
+	public ClassFieldAccessCollector(TypeDeclaration declaringType) {
+		this.declaringTypeBinding = declaringType.resolveBinding();
+		this.allVariables = this.getVariablesInHierarchy();
+	}
 
-        /**
-         * Check if the binding refers to a variable. If so, check whether the variable us a field in class
-         */
-        if (binding.getKind() == IBinding.VARIABLE) {
-            IVariableBinding variableBinding = (IVariableBinding) binding;
-            // Check if it is collected yet
-            if(!wasAlreadyCollected(variableBinding) && this.allVariables.contains(variableBinding)){
-                this.addCollectedNode(variableBinding);
-            }
-        }
-        return true;
-    }
+	public boolean visit(SimpleName node) {
+		/*
+		fragment used to demonstrate how to collect info on the ast
 
-    private Set<IVariableBinding> getVariablesHierarchy(){
-        Set<IVariableBinding> fields = new HashSet<>();
-        ITypeBinding type = this.declareTypeBinding;
+		if (this.declaringTypeBinding.getName().toString().equals("DummyDad")){
+			System.out.println("enter");
+		}
+		*/
 
-        while (type != null){
-            IVariableBinding[] localFields = type.getDeclaredFields();
-            fields.addAll(Arrays.asList(localFields));
-            type = type.getSuperclass();
-        }
-        return fields;
-    }
+		if (this.declaringTypeBinding == null) {
+			return false;
+		}
 
+		IBinding binding = node.resolveBinding();
+		if (binding == null) {
+			return false;
+		}
+
+		/*
+		 * Checks if the binding refers to a variable's access. If so,
+		 * it checks whether the variable is a field in the class.
+		 */
+		if (binding.getKind() == IBinding.VARIABLE) {
+			IVariableBinding variableBinding = (IVariableBinding) binding;
+
+			if (!wasAlreadyCollected(variableBinding) && this.allVariables.contains(variableBinding)) {
+				this.addCollectedNode(variableBinding);
+			}
+		}
+		return true;
+	}
+
+	private Set<IVariableBinding> getVariablesInHierarchy() {
+		Set<IVariableBinding> variables = new HashSet<>();
+		ITypeBinding type = this.declaringTypeBinding;
+
+		while (type != null) {
+			IVariableBinding[] localVariables = type.getDeclaredFields();
+			variables.addAll(Arrays.asList(localVariables));
+			type = type.getSuperclass();
+		}
+		return variables;
+	}
 
 }

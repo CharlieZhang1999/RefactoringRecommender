@@ -2,6 +2,7 @@ package cmu.csdetector.metrics;
 
 import cmu.csdetector.ast.visitors.ClassFieldAccessCollector;
 import cmu.csdetector.metrics.calculators.type.*;
+import cmu.csdetector.metrics.calculators.type.*;
 
 public class TypeMetricValueCollector extends MetricValueCollector {
 
@@ -14,6 +15,7 @@ public class TypeMetricValueCollector extends MetricValueCollector {
 		addCalculator(new TCCMetricValueCalculator());
 		addCalculator(new WMCCalculator());
 		addCalculator(new WOCCalculator());
+		addCalculator(new LCOM2Calculator());
 	}
 	
 	
