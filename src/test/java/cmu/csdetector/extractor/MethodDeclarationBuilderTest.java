@@ -1,27 +1,22 @@
 package cmu.csdetector.extractor;
 
 import cmu.csdetector.util.GetTargetType;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-class OpportunityExtractorTest {
-    private void prettyPrintOpportunities(Set<List<Integer>> opportunitySet) {
-        opportunitySet.stream()
-            // sort by the first line number, then by the last line number
-            .sorted(Comparator.comparingInt((List<Integer> o) -> o.get(0)).thenComparingInt(o -> o.get(o.size() - 1)))
-            .forEach(opportunity -> {
-                System.out.println("Opportunity: " + opportunity);
-            });
-    }
+class MethodDeclarationBuilderTest {
 
     @Test
-    void extract() throws IOException {
+    void createMethodFromLineNumbers() throws IOException {
         // var smellyTarget = GetTargetType.getRefactoringExample();
         var smellyTarget = GetTargetType.getComplexClass();
+        var sourceFile = smellyTarget.getSourceFile().getFile();
 
         StatementVisitor visitor = new StatementVisitor();
         smellyTarget.getNode().accept(visitor);
@@ -37,12 +32,18 @@ class OpportunityExtractorTest {
                 opportunitySet.addAll(opportunities);
             }
         }
-
-        // check the opportunities
-        assertTrue(opportunitySet.size() > 0);
-        assertTrue(opportunitySet.stream().allMatch(opportunity -> opportunity.size() > 1));
-
-        // pretty print the opportunities
-        this.prettyPrintOpportunities(opportunitySet);
+        opportunitySet.forEach((List<Integer> opportunity) -> {
+            int startLine = opportunity.get(0);
+            int endLine = opportunity.get(opportunity.size() - 1);
+            try {
+                MethodDeclarationBuilder methodDeclarationBuilder = new MethodDeclarationBuilder(sourceFile);
+                MethodDeclaration method = methodDeclarationBuilder.createMethodFromLineNumbers("test", startLine, endLine);
+                System.out.println("Opportunity: [" + startLine + " - " + endLine + "]");
+                System.out.println(method);
+                System.out.println("--------------------");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

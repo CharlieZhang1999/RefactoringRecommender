@@ -29,7 +29,7 @@ public class OpportunityExtractor implements Iterator<List<List<Integer>>> {
     /**
      * Return the opportunities with the given step and start index by applying sliding window.
      *
-     * @return the line numbers of the opportunities
+     * @return the line numbers of the opportunities. Each opportunity is a list of line numbers whose length is greater than 1.
      */
     @Override
     public List<List<Integer>> next() {
@@ -46,6 +46,8 @@ public class OpportunityExtractor implements Iterator<List<List<Integer>>> {
         this.startIndex++;
 
         return opportunitySet.stream()
+                // keep the opportunities whose length is greater than 1
+                .filter(opportunity -> opportunity.size() > 1)
                 // sort by the first line number, then by the last line number
                 .sorted(Comparator.comparingInt((List<Integer> o) -> o.get(0)).thenComparingInt(o -> o.get(o.size() - 1)))
                 .collect(Collectors.toList());
