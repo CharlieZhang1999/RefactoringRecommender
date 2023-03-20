@@ -265,6 +265,17 @@ public class StatementVisitor extends ASTVisitor {
     }
 
     /**
+     * get the combined map of variable name and called methods to nodes
+     * @return the combined map
+     */
+    public Map<String, Set<ASTNode>> getMergedNameToNodesMap() {
+        Map<String, Set<ASTNode>> mergedMap = new HashMap<>();
+        mergedMap.putAll(this.variableToNodes);
+        mergedMap.putAll(this.methodToNodes);
+        return mergedMap;
+    }
+
+    /**
      * Get the combined sorted map of line number to accessed variables and called methods
      */
     public SortedMap<Integer, Set<String>> getLineNumToStatementsTable(CompilationUnit cu) {
