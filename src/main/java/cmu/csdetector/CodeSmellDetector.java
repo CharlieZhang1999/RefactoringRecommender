@@ -2,6 +2,7 @@ package cmu.csdetector;
 
 import cmu.csdetector.console.ToolParameters;
 import cmu.csdetector.console.output.ObservableExclusionStrategy;
+import cmu.csdetector.extractor.Extractor;
 import cmu.csdetector.metrics.MethodMetricValueCollector;
 import cmu.csdetector.metrics.TypeMetricValueCollector;
 import cmu.csdetector.resources.Method;
@@ -52,6 +53,22 @@ public class CodeSmellDetector {
         collectTypeMetrics(allTypes);
 
         detectSmells(allTypes);
+
+        // apply Extractor on all smells
+        allTypes.forEach(type -> {
+            // method-level smells
+            type.getMethods().forEach(method -> {
+                method.getSmells().forEach(smell -> {
+                    Extractor extractor = new Extractor(smell.getResource());
+                    extractor.extract();
+                });
+            });
+            // class-level smells
+            type.getSmells().forEach(smell -> {
+                Extractor extractor = new Extractor(smell.getResource());
+                extractor.extract();
+            });
+        });
 
         saveSmellsFile(allTypes);
 

@@ -8,7 +8,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class OpportunityExtractorTest {
+class StepIteratorTest {
     private void prettyPrintOpportunities(Set<List<Integer>> opportunitySet) {
         opportunitySet.stream()
             // sort by the first line number, then by the last line number
@@ -30,9 +30,9 @@ class OpportunityExtractorTest {
         // extract the opportunities
         Set<List<Integer>> opportunitySet = new HashSet<>();
         for (int step = 1; step < statementsTable.size(); step++) {
-            OpportunityExtractor opportunityExtractor = new OpportunityExtractor(statementsTable, step);
-            while (opportunityExtractor.hasNext()) {
-                List<List<Integer>> opportunities = opportunityExtractor.next();
+            StepIterator stepIterator = new StepIterator(statementsTable, step);
+            while (stepIterator.hasNext()) {
+                List<List<Integer>> opportunities = stepIterator.next();
                 // add the opportunities whose length is greater than 1 to the map
                 opportunitySet.addAll(opportunities);
             }

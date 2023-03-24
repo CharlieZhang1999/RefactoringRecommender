@@ -4,16 +4,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * OpportunityExtractor is an iterator that iterates over the statements table by given step.
+ * An iterator that iterates over the statements table by given step.
  * It returns the group of line numbers that has the next opportunity to extract a method.
  */
-public class OpportunityExtractor implements Iterator<List<List<Integer>>> {
+public class StepIterator implements Iterator<List<List<Integer>>> {
     private final SortedMap<Integer, Set<String>> line2vars;
     private final int step; // window size
     private int startIndex;
     private final Integer[] line2varsKeys;
 
-    public OpportunityExtractor(SortedMap<Integer, Set<String>> line2vars, int step) {
+    public StepIterator(SortedMap<Integer, Set<String>> line2vars, int step) {
         this.line2vars = line2vars;
         this.step = step;
         this.startIndex = 0;
@@ -37,6 +37,7 @@ public class OpportunityExtractor implements Iterator<List<List<Integer>>> {
         for (int left = startIndex; left < line2vars.size() - step; left++) {
             // slice the sorted map by the window size
             SortedMap<Integer, Set<String>> ln2VarWindow = line2vars.subMap(line2varsKeys[left], line2varsKeys[left + step]);
+            // if all lines share at least one variable / method, then there is an opportunity
             if (haveOverlap(new ArrayList<>(ln2VarWindow.values()))) {
                 opportunitySet.add(new ArrayList<>(ln2VarWindow.keySet()));
             }

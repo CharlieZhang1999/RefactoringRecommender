@@ -1,21 +1,24 @@
 package cmu.csdetector.extractor;
 
 import java.util.List;
-import java.util.Set;
 
 public class OpportunityProcessor {
-    private final Set<List<Integer>> opportunitySet;
-
-    // Settings
-    // The maximum allowed difference in size between two opportunities to be considered valid for grouping
+    private final List<ExtractedMethod> extractedMethods;
+    /**
+     * The maximum allowed difference in size between two opportunities to be considered valid for grouping
+     */
     private final double maxSizeDifference = .2;
-    // The minimum allowed overlap in the range of two opportunities to be considered valid for grouping
+    /**
+     * The minimum allowed overlap in the range of two opportunities to be considered valid for grouping
+     */
     private final double minOverlap = .1;
-    // The minimum difference in the benefit incurred by the two opportunities, to decide which one is the optimal
+    /**
+     * The minimum difference in the benefit incurred by the two opportunities, to decide which one is the optimal
+     */
     private final double significantDifferenceThreshold = .01;
 
-    public OpportunityProcessor(Set<List<Integer>> opportunitySet) {
-        this.opportunitySet = opportunitySet;
+    public OpportunityProcessor(List<ExtractedMethod> extractedMethods) {
+        this.extractedMethods = extractedMethods;
     }
 
     private boolean isSimilarSize(List<Integer> a, List<Integer> b) {

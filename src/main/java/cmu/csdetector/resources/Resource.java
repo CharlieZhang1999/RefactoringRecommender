@@ -99,4 +99,8 @@ public abstract class Resource extends Observable {
         return false;
     }
 
+    public List<Smell> getSmells() {
+        return smells;
+    }
+
 }

@@ -10,28 +10,30 @@ import java.util.List;
 public abstract class SmellDetector {
 
 	/**
-	 * Given a resource, return a list of existing smells 
+	 * Given a resource, return a list of existing smells
 	 * @param resource to be evaluated
 	 * @return a list of existing smells
 	 */
 	public abstract List<Smell> detect(Resource resource);
 
 	protected abstract SmellName getSmellName();
-	
+
 	protected Smell createSmell(Resource resource, String reason) {
 		Smell smell = new Smell(getSmellName(), reason);
 
 		smell.setStartingLine(resource.getStartLineNumber());
 		smell.setEndingLine(resource.getEndLineNumber());
+		smell.setResource(resource);
 
 		return smell;
 	}
-	
+
 	protected Smell createSmell(Resource resource) {
 		Smell smell = new Smell(getSmellName());
 
 		smell.setStartingLine(resource.getStartLineNumber());
 		smell.setEndingLine(resource.getEndLineNumber());
+		smell.setResource(resource);
 
 		return smell;
 	}

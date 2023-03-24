@@ -1,27 +1,35 @@
 package cmu.csdetector.smells;
 
+import cmu.csdetector.resources.Resource;
+
 public class Smell {
 
 	private SmellName name;
-	
+
 	private String reason;
-	
+
 	/**
 	 * Line of code where the smell starts
 	 */
 	private Integer startingLine;
-	
+
 	private Integer endingLine;
-	
+
+	/**
+	 * Related resource (Class (Type) or Method).
+	 * No serialization for this field.
+	 */
+	private transient Resource resource;
+
 	public Smell(SmellName name) {
 		this.name = name;
 	}
-	
+
 	public Smell(SmellName name, String reason) {
 		this.name = name;
 		this.reason = reason;
 	}
-	
+
 	public Smell(SmellName name, String reason, Integer line) {
 		this.name = name;
 		this.reason = reason;
@@ -59,5 +67,12 @@ public class Smell {
 	public void setEndingLine(Integer endingLine) {
 		this.endingLine = endingLine;
 	}
-	
+
+	public Resource getResource() {
+		return resource;
+	}
+
+	public void setResource(Resource resource) {
+		this.resource = resource;
+	}
 }
