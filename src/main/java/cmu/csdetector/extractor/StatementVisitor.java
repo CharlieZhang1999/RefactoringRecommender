@@ -3,9 +3,8 @@ package cmu.csdetector.extractor;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * StatementVisitor helps build StatementsTable
@@ -17,7 +16,7 @@ public class StatementVisitor extends ASTVisitor {
     // maps method name to the node
     private final Map<String, Set<ASTNode>> methodToNodes = new HashMap<>();
 
-    // maps else / else if to the if node
+    // maps else / else if to the `if` node
     private final Map<Statement, IfStatement> elseToIf = new HashMap<>();
 
     private void addVariableToNodes(String variableName, ASTNode node) {
@@ -266,6 +265,7 @@ public class StatementVisitor extends ASTVisitor {
 
     /**
      * get the combined map of variable name and called methods to nodes
+     *
      * @return the combined map
      */
     public Map<String, Set<ASTNode>> getMergedNameToNodesMap() {
@@ -273,6 +273,28 @@ public class StatementVisitor extends ASTVisitor {
         mergedMap.putAll(this.variableToNodes);
         mergedMap.putAll(this.methodToNodes);
         return mergedMap;
+    }
+
+    public Set<ASTNode> getNodesByLineNumbers(List<Integer> lineNumbers, SortedMap<Integer, Set<String>> statementsTable) {
+        return statementsTable.entrySet().stream()
+                .filter(entry -> lineNumbers.contains(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .flatMap(Collection::stream)
+                .map(this.getMergedNameToNodesMap()::get)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<ASTNode> getNodesByLineNumbers(List<Integer> lineNumbers, CompilationUnit cu) {
+        return this.getLineNumToStatementsTable(cu).entrySet().stream()
+                .filter(entry -> lineNumbers.contains(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .flatMap(Collection::stream)
+                .map(this.getMergedNameToNodesMap()::get)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
     /**

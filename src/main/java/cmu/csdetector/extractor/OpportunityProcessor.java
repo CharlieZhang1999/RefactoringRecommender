@@ -1,5 +1,11 @@
 package cmu.csdetector.extractor;
 
+import cmu.csdetector.metrics.calculators.type.LCOM2Calculator;
+import cmu.csdetector.metrics.calculators.type.LCOM3Calculator;
+import cmu.csdetector.resources.Type;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class OpportunityProcessor {
@@ -17,27 +23,46 @@ public class OpportunityProcessor {
      */
     private final double significantDifferenceThreshold = .01;
 
+
     public OpportunityProcessor(List<ExtractedMethod> extractedMethods) {
         this.extractedMethods = extractedMethods;
     }
 
-    private boolean isSimilarSize(List<Integer> a, List<Integer> b) {
-        var aSize = a.size();
-        var bSize = b.size();
+    public List<ExtractedMethod> process() {
+        List<ExtractedMethod> result = new ArrayList<>();
+        for (ExtractedMethod extractedMethod : extractedMethods) {
+            System.out.println(calcBenefit(extractedMethod));
+        }
+        return result;
+    }
+
+    private boolean isSimilarSize(ExtractedMethod a, ExtractedMethod b) {
+        Integer[] aRange = a.getLineRange();
+        int aSize = aRange[1] - aRange[0];
+        Integer[] bRange = b.getLineRange();
+        int bSize = bRange[1] - bRange[0];
+
         var minSize = Math.min(aSize, bSize);
         var diff = Math.abs(aSize - bSize);
         return diff < minSize * maxSizeDifference;
     }
 
-    private boolean isSignificantlyOverlapping(List<Integer> a, List<Integer> b) {
-        var aSize = a.size();
-        var bSize = b.size();
+    private boolean isSignificantlyOverlapping(ExtractedMethod a, ExtractedMethod b) {
+        Integer[] aRange = a.getLineRange();
+        int aSize = aRange[1] - aRange[0];
+        Integer[] bRange = b.getLineRange();
+        int bSize = bRange[1] - bRange[0];
+
         var maxSize = Math.max(aSize, bSize);
-        var intersectionSize = a.stream().filter(b::contains).count();
+        var intersectionSize = Math.min(aRange[1], bRange[1]) - Math.max(aRange[0], bRange[0]);
         return intersectionSize > minOverlap * maxSize;
     }
 
-    private int calcBenefit(List<Integer> a, List<Integer> b) {
-        return 0;
+    private double calcBenefit(ExtractedMethod extractedMethod) {
+        double originalLCOM = extractedMethod.getOriginalLCOM();
+        double newLCOM = extractedMethod.getOpportunityLCOM(); // opportunity lcom
+        double refactoredLCOM = extractedMethod.getRefactoredLCOM();
+
+        return originalLCOM - Math.max(newLCOM, refactoredLCOM);
     }
 }

@@ -39,7 +39,7 @@ class ExtractedMethodTest {
             try {
                 ExtractedMethod extractedMethod = new ExtractedMethod(sourceFile, startLine, endLine);
                 extractedMethod.create();
-                MethodDeclaration method = extractedMethod.getMethodDeclaration();
+                MethodDeclaration method = extractedMethod.getExtractedMethodDeclaration();
                 if (method != null) {
                     System.out.println("Opportunity: [" + startLine + " - " + endLine + "]");
                     System.out.println(method);

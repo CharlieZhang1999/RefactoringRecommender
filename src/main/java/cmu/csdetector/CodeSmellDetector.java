@@ -59,7 +59,7 @@ public class CodeSmellDetector {
             // method-level smells
             type.getMethods().forEach(method -> {
                 method.getSmells().forEach(smell -> {
-                    Extractor extractor = new Extractor(smell.getResource());
+                    Extractor extractor = new Extractor(smell.getResource(), type);
                     extractor.extract();
                 });
             });

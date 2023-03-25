@@ -68,8 +68,8 @@ public class Smell {
 		this.endingLine = endingLine;
 	}
 
-	public Resource getResource() {
-		return resource;
+	public <T extends Resource> T getResource() {
+		return (T) resource;
 	}
 
 	public void setResource(Resource resource) {
