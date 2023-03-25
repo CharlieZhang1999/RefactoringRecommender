@@ -1,10 +1,9 @@
 package cmu.csdetector.extractor;
 
-import cmu.csdetector.ast.ASTBuilder;
-import cmu.csdetector.console.ConsoleProgressMonitor;
+import cmu.csdetector.metrics.calculators.type.BaseLCOM;
+import cmu.csdetector.resources.Type;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
 import cmu.csdetector.resources.loader.SourceFile;
-import cmu.csdetector.resources.loader.SourceFileASTRequestor;
 import cmu.csdetector.resources.loader.SourceFilesLoader;
 import org.eclipse.jdt.core.dom.*;
 
@@ -135,12 +134,12 @@ public class ExtractedMethod {
         TypeDeclaration typeDeclaration = ast.newTypeDeclaration();
         typeDeclaration.bodyDeclarations().add(extractedMethodDeclaration);
         typeDeclaration.modifiers().add(ast.newModifier(Modifier.ModifierKeyword.PUBLIC_KEYWORD));
+        typeDeclaration.setName(ast.newSimpleName("Opportunity"));
         cu.types().add(typeDeclaration);
         List<String> packageDeclarations = Files.lines(Paths.get(sourceFilePath)).filter(line -> line.startsWith("package")).collect(Collectors.toList());
 
         // save the new class to a new java file
-        String newFilePath = sourceFilePath.replace(".java", "_opportunity.java");
-        this.saveJavaFile(newFilePath, String.join("\n", packageDeclarations) + "\n" + cu);
+        this.saveJavaFile("Opportunity.java", String.join("\n", packageDeclarations) + "\n" + cu);
     }
 
     private void createRefactoredType() throws IOException {
@@ -148,23 +147,31 @@ public class ExtractedMethod {
         List<String> allLines = Files.lines(Paths.get(sourceFilePath)).collect(Collectors.toList());
         List<String> newLines = new ArrayList<>();
         for (int i = 0; i < allLines.size(); i++) {
-            if (i < startLine - 1 || i > endLine - 1) {
+            if ((i < startLine - 1 || i > endLine - 1) && !allLines.get(i).isBlank()) {
                 newLines.add(allLines.get(i));
             }
         }
 
         // create a new method declaration
-        ASTParser parser = ASTParser.newParser(AST.JLS17);
+        ASTParser parser = ASTParser.newParser(AST.JLS11);
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
         parser.setSource(String.join("\n", newLines).toCharArray());
         CompilationUnit cu = (CompilationUnit) parser.createAST(null);
         cu.recordModifications();
 
+        // set to null if cu lines < newLines
+        int cuLines = cu.toString().split("\n").length;
+        if (cuLines < newLines.size()) {
+            refactoredTypeDeclaration = null;
+            return;
+        }
+
         refactoredTypeDeclaration = (TypeDeclaration) cu.types().get(0);
+        String newClassName = refactoredTypeDeclaration.getName().getIdentifier() + "Refactored";
+        refactoredTypeDeclaration.setName(cu.getAST().newSimpleName(newClassName));
 
         // save refactoredTypeDeclaration to a new file
-        String newFilePath = sourceFilePath.replace(".java", "_refactored.java");
-        this.saveJavaFile(newFilePath, cu.toString());
+        this.saveJavaFile(newClassName + ".java", cu.toString());
     }
 
     /**
@@ -232,14 +239,12 @@ public class ExtractedMethod {
         this.extractedMethodDeclaration.parameters().addAll(parameters);
     }
 
-    public void setThreeLCOM(double originalLCOM, double refactoredLCOM, double opportunityLCOM) {
-        this.originalLCOM = originalLCOM;
-        this.refactoredLCOM = refactoredLCOM;
-        this.opportunityLCOM = opportunityLCOM;
-    }
-
     public double getOriginalLCOM() {
         return originalLCOM;
+    }
+
+    public void setOriginalLCOM(double originalLCOM) {
+        this.originalLCOM = originalLCOM;
     }
 
     public double getRefactoredLCOM() {
@@ -250,9 +255,52 @@ public class ExtractedMethod {
         return opportunityLCOM;
     }
 
-    private void saveJavaFile(String filePath, String content) throws IOException {
-        FileWriter writer = new FileWriter(filePath);
+    private void saveJavaFile(String newFileName, String content) throws IOException {
+        // replace the original file name with the new file name
+        String newFilePath = sourceFile.getParentFile().getAbsolutePath() + File.separator + newFileName;
+        FileWriter writer = new FileWriter(newFileName.endsWith(".java") ? newFilePath : newFilePath + ".java");
         writer.write(content);
         writer.close();
+    }
+
+    private void deleteJavaFile(String fileName) {
+        String filePath = sourceFile.getParentFile().getAbsolutePath() + File.separator + fileName;
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    public void calculateLCOM(TypeDeclaration belongingTypeDeclaration, BaseLCOM calculator) throws IOException {
+        String originalClassName = belongingTypeDeclaration.getName().getIdentifier();
+        String refactoredClassName = originalClassName + "Refactored";
+        String opportunityClassName = "Opportunity";
+        // get file path from source file
+        String filePath = sourceFile.getAbsolutePath();
+        // get its directory path
+        String dirPath = filePath.substring(0, filePath.lastIndexOf(File.separator));
+        // find the target type declaration by identifier
+        JavaFilesFinder finder = new JavaFilesFinder(dirPath);
+        SourceFilesLoader loader = new SourceFilesLoader(finder);
+        for (SourceFile sourceFile : loader.getLoadedSourceFiles()) {
+            for (Type sourceType : sourceFile.getTypes()) {
+                String sourceIdentifier = sourceType.getNodeAsTypeDeclaration().getName().getIdentifier();
+                if (!sourceIdentifier.equals(originalClassName) && !sourceIdentifier.equals(refactoredClassName) && !sourceIdentifier.equals(opportunityClassName)) {
+                    continue;
+                }
+                Double lcom = calculator.getValue(sourceType.getNodeAsTypeDeclaration());
+                if (sourceIdentifier.equals(originalClassName)) {
+                    this.originalLCOM = lcom;
+                } else if (sourceIdentifier.equals(refactoredClassName)) {
+                    this.refactoredLCOM = lcom;
+                } else if (sourceIdentifier.equals(opportunityClassName)) {
+                    this.opportunityLCOM = lcom;
+                }
+            }
+        }
+
+        // delete the refactored type declaration file
+        this.deleteJavaFile(refactoredClassName + ".java");
+        this.deleteJavaFile(opportunityClassName + ".java");
     }
 }

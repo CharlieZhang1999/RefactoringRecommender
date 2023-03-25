@@ -7,16 +7,11 @@ import cmu.csdetector.resources.Type;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
 import cmu.csdetector.resources.loader.SourceFile;
 import cmu.csdetector.resources.loader.SourceFilesLoader;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.*;
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.Document;
-import org.eclipse.text.edits.TextEdit;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.PrimitiveType;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,34 +87,30 @@ public class Extractor {
                         em.create();
 
                         // calculate 3 types of LCOM
-                        //var nodesToBeRemoved = this.statementVisitor.getNodesByLineNumbers(em.getLineNumbers(), statementsTable);
-                        double originalLCOM2 = new LCOM2Calculator().getValue(this.belongingType.getNodeAsTypeDeclaration());
-                        double refactoredLCOM2 = 0;
-                        double opportunityLCOM2 = 0;
-                        em.setThreeLCOM(originalLCOM2, refactoredLCOM2, opportunityLCOM2);
+                        em.calculateLCOM(this.belongingType.getNodeAsTypeDeclaration(), new LCOM2Calculator());
 
                         return em;
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 })
-                .filter((ExtractedMethod em) -> em.getExtractedMethodDeclaration() != null)
+                .filter((ExtractedMethod em) -> em.getExtractedMethodDeclaration() != null && em.getRefactoredTypeDeclaration() != null)
                 .collect(Collectors.toList());
 
-        // filter & ranking
+        // Step 4: Filter & ranking the opportunities
         OpportunityProcessor opportunityProcessor = new OpportunityProcessor(extractedMethods);
-        opportunityProcessor.process();
+        extractedMethods = opportunityProcessor.process(); // processed opportunities
 
-        // Step 4: Assign the method name, parameters, and return type to each method declaration
+        // Step 5: Assign the method name, parameters, and return type to each method declaration
         // TODO: Implement this step, e.g., using GPT fine-tuning
         extractedMethods.forEach(method -> {
             method.setExtractedMethodName("extractedMethod");
             method.setExtractedMethodParameters(new ArrayList<>());
             method.setExtractedMethodReturnType(PrimitiveType.VOID);
-//            System.out.println(method.getMethodDeclaration().toString());
+            System.out.println(method.getExtractedMethodDeclaration());
         });
 
-        // Step 5: Finding the Target class
+        // Step 6: Finding the Target class
         // TODO: Implement this step, e.g., LCOM
     }
 
@@ -147,14 +138,6 @@ public class Extractor {
         } catch (IOException e) {
             return null;
         }
-        return null;
-    }
-
-    private TypeDeclaration getRefactoredBelongingType(TypeDeclaration refactoredTypeDeclaration) {
-        return null;
-    }
-
-    private TypeDeclaration getOpportunityBelongingType() {
         return null;
     }
 }

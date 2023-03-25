@@ -1,10 +1,5 @@
 package cmu.csdetector.extractor;
 
-import cmu.csdetector.metrics.calculators.type.LCOM2Calculator;
-import cmu.csdetector.metrics.calculators.type.LCOM3Calculator;
-import cmu.csdetector.resources.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +25,31 @@ public class OpportunityProcessor {
 
     public List<ExtractedMethod> process() {
         List<ExtractedMethod> result = new ArrayList<>();
-        for (ExtractedMethod extractedMethod : extractedMethods) {
-            System.out.println(calcBenefit(extractedMethod));
+        boolean[] grouped = new boolean[extractedMethods.size()];
+        for (int i = 0; i < extractedMethods.size(); i++) {
+            if (grouped[i]) {
+                continue;
+            }
+            ExtractedMethod current = extractedMethods.get(i);
+            for (int j = i + 1; j < extractedMethods.size(); j++) {
+                if (grouped[j]) {
+                    continue;
+                }
+                ExtractedMethod other = extractedMethods.get(j);
+                if (isSimilarSize(current, other) && isSignificantlyOverlapping(current, other)) {
+                    if (calcBenefit(current) - calcBenefit(other) > significantDifferenceThreshold) {
+                        grouped[j] = true;
+                    } else {
+                        grouped[i] = true;
+                        current = other;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < grouped.length; i++) {
+            if (!grouped[i]) {
+                result.add(extractedMethods.get(i));
+            }
         }
         return result;
     }
