@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class ExtractedMethod {
@@ -143,14 +144,59 @@ public class ExtractedMethod {
     }
 
     private void createRefactoredType() throws IOException {
+        // build two stacks to track the block level (the number of "{" and "}")
+        var frontBlockStack = new Stack<String>();
+        var rearBlockStack = new Stack<String>();
         // remove [startLine, endLine] from the original method
         List<String> allLines = Files.lines(Paths.get(sourceFilePath)).collect(Collectors.toList());
         List<String> newLines = new ArrayList<>();
+        int insertIdx = -1;
         for (int i = 0; i < allLines.size(); i++) {
-            if ((i < startLine - 1 || i > endLine - 1) && !allLines.get(i).isBlank()) {
-                newLines.add(allLines.get(i));
+            String line = allLines.get(i);
+            // drop the empty lines and comments
+            if (line.isBlank()) {
+                continue;
             }
+            if (line.trim().startsWith("//")) {
+                continue;
+            }
+            if (i < startLine - 1) {
+                if (line.contains("{")) {
+                    frontBlockStack.push("{");
+                } else if (line.contains("}")) {
+                    frontBlockStack.pop();
+                }
+            } else if (i > endLine - 1) {
+                if (line.contains("}")) {
+                    rearBlockStack.push("}");
+                } else if (line.contains("{")) {
+                    rearBlockStack.pop();
+                }
+            } else {
+                // update insertIdx
+                if (insertIdx == -1) {
+                    insertIdx = newLines.size();
+                }
+                continue;
+            }
+            newLines.add(line);
         }
+
+        // record the size of both stacks to remedy the cuLines
+        int stackSize = frontBlockStack.size() + rearBlockStack.size();
+
+        // insert the corresponding "{" and "}" into the insertIdx
+        while (!frontBlockStack.isEmpty()) {
+            // insert "}" to the insertIdx
+            newLines.add(insertIdx, "}");
+            frontBlockStack.pop();
+        }
+        while (!rearBlockStack.isEmpty()) {
+            // insert "{" to the insertIdx
+            newLines.add(insertIdx, "{");
+            rearBlockStack.pop();
+        }
+
 
         // create a new method declaration
         ASTParser parser = ASTParser.newParser(AST.JLS11);
@@ -161,7 +207,7 @@ public class ExtractedMethod {
 
         // set to null if cu lines < newLines
         int cuLines = cu.toString().split("\n").length;
-        if (cuLines < newLines.size()) {
+        if (cuLines + stackSize < newLines.size()) {
             refactoredTypeDeclaration = null;
             return;
         }
