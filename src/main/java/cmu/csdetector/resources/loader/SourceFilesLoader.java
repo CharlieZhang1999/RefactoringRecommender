@@ -40,7 +40,6 @@ public class SourceFilesLoader {
 			files[i] = sourceFiles.get(i).getAbsolutePath();
 		}
 
-		// Create AST
 		String[] sourcePaths = loader.getSourcePaths();
 		ASTBuilder builder = new ASTBuilder(sourcePaths);
 		ASTParser parser = builder.create();

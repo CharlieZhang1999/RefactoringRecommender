@@ -47,7 +47,7 @@ public class ClassMethodInvocationVisitor extends ASTVisitor {
 			return true;
 		}
 
-		if (typeBinding.getQualifiedName().startsWith("java")){ // java.long...System.out.println()...
+		if (typeBinding.getQualifiedName().startsWith("java")){
 			return true;
 		}
 		

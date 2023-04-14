@@ -2,15 +2,19 @@ package cmu.csdetector;
 
 import cmu.csdetector.console.ToolParameters;
 import cmu.csdetector.console.output.ObservableExclusionStrategy;
+import cmu.csdetector.extractor.Extractor;
 import cmu.csdetector.metrics.MethodMetricValueCollector;
 import cmu.csdetector.metrics.TypeMetricValueCollector;
 import cmu.csdetector.resources.Method;
+import cmu.csdetector.resources.Type;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
 import cmu.csdetector.resources.loader.SourceFile;
 import cmu.csdetector.resources.loader.SourceFilesLoader;
+import cmu.csdetector.smells.ClassLevelSmellDetector;
+import cmu.csdetector.smells.MethodLevelSmellDetector;
+import cmu.csdetector.smells.Smell;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import cmu.csdetector.resources.Type;
 import org.apache.commons.cli.ParseException;
 
 import java.io.BufferedWriter;
@@ -43,51 +47,80 @@ public class CodeSmellDetector {
         }
 
         System.out.println(new Date());
-
         List<String> sourcePaths = List.of(parameters.getValue(ToolParameters.SOURCE_FOLDER));
-        List<Type> allTypes = loadAllTypes(sourcePaths);
-
-        System.out.println(allTypes);
+        List<Type> allTypes = this.loadAllTypes(sourcePaths);
 
         collectTypeMetrics(allTypes);
-        saveSmellsFile(allTypes);
 
-        //todo: we'll include the logic to collect the metrics and detect smells here
+        detectSmells(allTypes);
+
+        // apply Extractor on all smells
+        allTypes.forEach(type -> {
+            // method-level smells
+            type.getMethods().forEach(method -> {
+                method.getSmells().forEach(smell -> {
+                    Extractor extractor = new Extractor(smell.getResource(), type);
+                    extractor.extract();
+                });
+            });
+            // class-level smells
+            type.getSmells().forEach(smell -> {
+                Extractor extractor = new Extractor(smell.getResource());
+                extractor.extract();
+            });
+        });
+
+        saveSmellsFile(allTypes);
 
         System.out.println(new Date());
 
     }
 
-    private List<Type> loadAllTypes(List<String> sourcePaths) throws IOException{
+    private void detectSmells(List<Type> allTypes) {
+        for (Type type : allTypes) {
+            // It is important to detect certain smells at method level first, such as Brain Method
+            MethodLevelSmellDetector methodLevelSmellDetector = new MethodLevelSmellDetector();
+
+            for (Method method : type.getMethods()) {
+                List<Smell> smells = methodLevelSmellDetector.detect(method);
+                method.addAllSmells(smells);
+            }
+
+            // Some class-level smell detectors rely on method-level smells as part of their detection
+            ClassLevelSmellDetector classLevelSmellDetector = new ClassLevelSmellDetector();
+            List<Smell> smells = classLevelSmellDetector.detect(type);
+            type.addAllSmells(smells);
+        }
+    }
+
+    private List<Type> loadAllTypes(List<String> sourcePaths) throws IOException {
         List<Type> allTypes = new ArrayList<>();
 
         JavaFilesFinder sourceLoader = new JavaFilesFinder(sourcePaths);
-        SourceFilesLoader compUnitLoader = new SourceFilesLoader(sourceLoader);  // Dependency Injection
-
+        SourceFilesLoader compUnitLoader = new SourceFilesLoader(sourceLoader);
         List<SourceFile> sourceFiles = compUnitLoader.getLoadedSourceFiles();
-        for(SourceFile sourceFile: sourceFiles) {
+
+        for (SourceFile sourceFile : sourceFiles) {
             allTypes.addAll(sourceFile.getTypes());
         }
-
         return allTypes;
     }
 
-    private void collectTypeMetrics(List<Type> types){ // classes or interfaces
-        TypeMetricValueCollector collector;
-        for (Type type: types){
-            collector = new TypeMetricValueCollector();
-            collector.collect(type);
+    private void collectTypeMetrics(List<Type> types) {
+        for (Type type : types) {
+            TypeMetricValueCollector typeCollector = new TypeMetricValueCollector();
+            typeCollector.collect(type);
+
             this.collectMethodMetrics(type);
         }
     }
 
-    private void collectMethodMetrics(Type type){
-        for (Method method: type.getMethods()){
-            MethodMetricValueCollector collector = new MethodMetricValueCollector();
-            collector.collect(method);
+    private void collectMethodMetrics(Type type) {
+        for (Method method : type.getMethods()) {
+            MethodMetricValueCollector methodCollector = new MethodMetricValueCollector();
+            methodCollector.collect(method);
         }
     }
-
 
     private void saveSmellsFile(List<Type> smellyTypes) throws IOException {
         ToolParameters parameters = ToolParameters.getInstance();
