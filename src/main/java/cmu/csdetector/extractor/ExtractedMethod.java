@@ -145,8 +145,8 @@ public class ExtractedMethod {
 
     private void createRefactoredType() throws IOException {
         // build two stacks to track the block level (the number of "{" and "}")
-        var frontBlockStack = new Stack<String>();
-        var rearBlockStack = new Stack<String>();
+        int frontBlockStack = 0;
+        int rearBlockStack = 0;
         // remove [startLine, endLine] from the original method
         List<String> allLines = Files.lines(Paths.get(sourceFilePath)).collect(Collectors.toList());
         List<String> newLines = new ArrayList<>();
@@ -160,17 +160,17 @@ public class ExtractedMethod {
             if (line.trim().startsWith("//")) {
                 continue;
             }
-            if (i < startLine - 1) {
+            if (i+1 < startLine) {
                 if (line.contains("{")) {
-                    frontBlockStack.push("{");
+                    frontBlockStack++;
                 } else if (line.contains("}")) {
-                    frontBlockStack.pop();
+                    frontBlockStack--;
                 }
-            } else if (i > endLine - 1) {
+            } else if (i+1 > endLine) {
                 if (line.contains("}")) {
-                    rearBlockStack.push("}");
+                    rearBlockStack++;
                 } else if (line.contains("{")) {
-                    rearBlockStack.pop();
+                    rearBlockStack--;
                 }
             } else {
                 // update insertIdx
@@ -183,20 +183,16 @@ public class ExtractedMethod {
         }
 
         // record the size of both stacks to remedy the cuLines
-        int stackSize = frontBlockStack.size() + rearBlockStack.size();
-
+        int stackSize = frontBlockStack + rearBlockStack;
         // insert the corresponding "{" and "}" into the insertIdx
-        while (!frontBlockStack.isEmpty()) {
-            // insert "}" to the insertIdx
-            newLines.add(insertIdx, "}");
-            frontBlockStack.pop();
-        }
-        while (!rearBlockStack.isEmpty()) {
+        for (int i = 0; i < rearBlockStack; i++) {
             // insert "{" to the insertIdx
             newLines.add(insertIdx, "{");
-            rearBlockStack.pop();
         }
-
+        for (int i = 0; i < frontBlockStack; i++) {
+            // insert "}" to the insertIdx
+            newLines.add(insertIdx, "}");
+        }
 
         // create a new method declaration
         ASTParser parser = ASTParser.newParser(AST.JLS11);
@@ -205,9 +201,9 @@ public class ExtractedMethod {
         CompilationUnit cu = (CompilationUnit) parser.createAST(null);
         cu.recordModifications();
 
-        // set to null if cu lines < newLines
+        // set to null if cu lines < newLines, which means some code fragments are dropped by cu
         int cuLines = cu.toString().split("\n").length;
-        if (cuLines + stackSize < newLines.size()) {
+        if (cuLines + stackSize < newLines.size() - 3) { // allow deviation of 3 lines
             refactoredTypeDeclaration = null;
             return;
         }

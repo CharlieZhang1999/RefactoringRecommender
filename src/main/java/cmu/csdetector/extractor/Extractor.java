@@ -1,5 +1,6 @@
 package cmu.csdetector.extractor;
 
+import cmu.csdetector.metrics.calculators.type.BaseLCOM;
 import cmu.csdetector.metrics.calculators.type.LCOM2Calculator;
 import cmu.csdetector.resources.Method;
 import cmu.csdetector.resources.Resource;
@@ -94,7 +95,7 @@ public class Extractor {
                         throw new RuntimeException(e);
                     }
                 })
-                .filter((ExtractedMethod em) -> em.getExtractedMethodDeclaration() != null && em.getRefactoredTypeDeclaration() != null)
+                .filter((ExtractedMethod em) -> em.getExtractedMethodDeclaration() != null && em.getRefactoredTypeDeclaration() != null) // drop uncompilable opportunities
                 .collect(Collectors.toList());
 
         // Step 4: Filter & ranking the opportunities
@@ -111,15 +112,22 @@ public class Extractor {
         });
 
         // Step 6: Finding the Target class
+        // Calculate LCOM for all candidate classes
+        List<Type> candidateClasses = getCandidateClasses();
+        Map<Type, Double> class2LCOM = new HashMap<>();
+        candidateClasses.forEach(type -> {
+            BaseLCOM lcomCalculator = new LCOM2Calculator();
+            class2LCOM.put(type, lcomCalculator.getValue(type.getNodeAsTypeDeclaration()));
+        });
         // TODO: Implement this step, e.g., LCOM
+
     }
 
     /**
-     * Get a copy of the belonging type of the target resource,
-     * which is able to resolve bindings.
-     * @return The cloned belonging type
+     * Get all candidate classes in the same package who may be the target class to move the extracted method to.
+     * @return All candidate classes in the same package
      */
-    private Type getClonedBelongingType() {
+    private List<Type> getCandidateClasses() {
         // get file path from source file
         String filePath = sourceFile.getAbsolutePath();
         // get its directory path
@@ -128,16 +136,12 @@ public class Extractor {
         JavaFilesFinder finder = new JavaFilesFinder(dirPath);
         try {
             SourceFilesLoader loader = new SourceFilesLoader(finder);
-            for (SourceFile sourceFile : loader.getLoadedSourceFiles()) {
-                for (Type sourceType : sourceFile.getTypes()) {
-                    if (sourceType.getNodeAsTypeDeclaration().getName().getIdentifier().equals(this.belongingType.getNodeAsTypeDeclaration().getName().getIdentifier())) {
-                        return sourceType;
-                    }
-                }
-            }
+            return loader.getLoadedSourceFiles().stream()
+                    .flatMap(sourceFile -> sourceFile.getTypes().stream())
+                    .filter(type -> !type.getNodeAsTypeDeclaration().getName().getIdentifier().equals(this.belongingType.getNodeAsTypeDeclaration().getName().getIdentifier())) // exclude the belonging type
+                    .collect(Collectors.toList());
         } catch (IOException e) {
-            return null;
+            return new ArrayList<>();
         }
-        return null;
     }
 }
