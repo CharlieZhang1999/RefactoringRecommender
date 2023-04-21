@@ -1,6 +1,7 @@
 package cmu.csdetector.extractor;
 
 import cmu.csdetector.metrics.calculators.type.BaseLCOM;
+import cmu.csdetector.metrics.calculators.type.LCOM3Calculator;
 import cmu.csdetector.resources.Type;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
 import cmu.csdetector.resources.loader.SourceFile;
@@ -15,7 +16,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class ExtractedMethod {
@@ -36,10 +36,18 @@ public class ExtractedMethod {
     private int endLine;
 
     /**
-     * Extracted method declaration
+     * Extracted method declaration (opportunity)
      */
     private MethodDeclaration extractedMethodDeclaration;
+    /**
+     * The class declaration after refactoring (opportunity extracted)
+     */
     private TypeDeclaration refactoredTypeDeclaration;
+
+    /**
+     * The compilation unit of the refactoredTypeDeclaration
+     */
+    private CompilationUnit refactoredTypeCU;
     private double originalLCOM = 0;
     private double opportunityLCOM = 0;
     private double refactoredLCOM = 0;
@@ -81,7 +89,7 @@ public class ExtractedMethod {
 
     private void createExtractedMethod() throws IOException {
         // create an AST
-        AST ast = AST.newAST(AST.JLS17);
+        AST ast = AST.newAST(AST.JLS11);
 
         // new a method declaration
         extractedMethodDeclaration = ast.newMethodDeclaration();
@@ -195,25 +203,31 @@ public class ExtractedMethod {
         }
 
         // create a new method declaration
-        ASTParser parser = ASTParser.newParser(AST.JLS11);
-        parser.setKind(ASTParser.K_COMPILATION_UNIT);
-        parser.setSource(String.join("\n", newLines).toCharArray());
-        CompilationUnit cu = (CompilationUnit) parser.createAST(null);
-        cu.recordModifications();
+        this.refactoredTypeCU = this.getCuFromLines(newLines);
 
         // set to null if cu lines < newLines, which means some code fragments are dropped by cu
-        int cuLines = cu.toString().split("\n").length;
+        int cuLines = this.refactoredTypeCU.toString().split("\n").length;
         if (cuLines + stackSize < newLines.size() - 3) { // allow deviation of 3 lines
-            refactoredTypeDeclaration = null;
+            this.refactoredTypeDeclaration = null;
             return;
         }
 
-        refactoredTypeDeclaration = (TypeDeclaration) cu.types().get(0);
+        // we got a valid extraction
+        this.refactoredTypeDeclaration = (TypeDeclaration) this.refactoredTypeCU.types().get(0);
         String newClassName = refactoredTypeDeclaration.getName().getIdentifier() + "Refactored";
-        refactoredTypeDeclaration.setName(cu.getAST().newSimpleName(newClassName));
+        this.refactoredTypeDeclaration.setName(this.refactoredTypeCU.getAST().newSimpleName(newClassName));
 
         // save refactoredTypeDeclaration to a new file
-        this.saveJavaFile(newClassName + ".java", cu.toString());
+        this.saveJavaFile(newClassName + ".java", this.refactoredTypeCU.toString());
+    }
+
+    private CompilationUnit getCuFromLines(List<String> lines) {
+        ASTParser parser = ASTParser.newParser(AST.JLS11);
+        parser.setKind(ASTParser.K_COMPILATION_UNIT);
+        parser.setSource(String.join("\n", lines).toCharArray());
+        CompilationUnit cu =  (CompilationUnit) parser.createAST(null);
+        cu.recordModifications();
+        return cu;
     }
 
     /**
@@ -223,7 +237,7 @@ public class ExtractedMethod {
      * @return Statement
      */
     private Statement buildStatementFromString(String statement) {
-        ASTParser parser = ASTParser.newParser(AST.JLS17);
+        ASTParser parser = ASTParser.newParser(AST.JLS11);
         parser.setKind(ASTParser.K_STATEMENTS);
         parser.setSource(statement.toCharArray());
         return (Statement) parser.createAST(null);
@@ -296,7 +310,15 @@ public class ExtractedMethod {
     public double getOpportunityLCOM() {
         return opportunityLCOM;
     }
-
+    public CompilationUnit getRefactoredTypeCU() {
+        return refactoredTypeCU;
+    }
+    /**
+     * temporarily save the refactored type declaration to a new file for LCOM calculation
+     * @param newFileName
+     * @param content
+     * @throws IOException
+     */
     private void saveJavaFile(String newFileName, String content) throws IOException {
         // replace the original file name with the new file name
         String newFilePath = sourceFile.getParentFile().getAbsolutePath() + File.separator + newFileName;
@@ -305,6 +327,10 @@ public class ExtractedMethod {
         writer.close();
     }
 
+    /**
+     * clean the temporary file
+     * @param fileName
+     */
     private void deleteJavaFile(String fileName) {
         String filePath = sourceFile.getParentFile().getAbsolutePath() + File.separator + fileName;
         File file = new File(filePath);
@@ -313,7 +339,12 @@ public class ExtractedMethod {
         }
     }
 
-    public void calculateLCOM(TypeDeclaration belongingTypeDeclaration, BaseLCOM calculator) throws IOException {
+    /**
+     * calculate LCOM for the original type declaration, the refactored type declaration, and the opportunity type declaration
+     * @param belongingTypeDeclaration the class that contains the extracted method
+     * @throws IOException
+     */
+    public void calculateLCOM(TypeDeclaration belongingTypeDeclaration) throws IOException {
         String originalClassName = belongingTypeDeclaration.getName().getIdentifier();
         String refactoredClassName = originalClassName + "Refactored";
         String opportunityClassName = "Opportunity";
@@ -330,7 +361,7 @@ public class ExtractedMethod {
                 if (!sourceIdentifier.equals(originalClassName) && !sourceIdentifier.equals(refactoredClassName) && !sourceIdentifier.equals(opportunityClassName)) {
                     continue;
                 }
-                Double lcom = calculator.getValue(sourceType.getNodeAsTypeDeclaration());
+                Double lcom = new LCOM3Calculator().getValue(sourceType.getNodeAsTypeDeclaration());
                 if (sourceIdentifier.equals(originalClassName)) {
                     this.originalLCOM = lcom;
                 } else if (sourceIdentifier.equals(refactoredClassName)) {

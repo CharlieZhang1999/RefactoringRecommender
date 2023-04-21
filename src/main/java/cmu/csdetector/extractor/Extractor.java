@@ -1,18 +1,17 @@
 package cmu.csdetector.extractor;
 
-import cmu.csdetector.metrics.calculators.type.BaseLCOM;
-import cmu.csdetector.metrics.calculators.type.LCOM2Calculator;
 import cmu.csdetector.resources.Method;
 import cmu.csdetector.resources.Resource;
 import cmu.csdetector.resources.Type;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
-import cmu.csdetector.resources.loader.SourceFile;
 import cmu.csdetector.resources.loader.SourceFilesLoader;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,8 +86,8 @@ public class Extractor {
                         ExtractedMethod em = new ExtractedMethod(sourceFile, startLine, endLine);
                         em.create();
 
-                        // calculate 3 types of LCOM
-                        em.calculateLCOM(this.belongingType.getNodeAsTypeDeclaration(), new LCOM2Calculator());
+                        // calculate 3 types of LCOM for Step 4
+                        em.calculateLCOM(this.belongingType.getNodeAsTypeDeclaration());
 
                         return em;
                     } catch (IOException e) {
@@ -104,36 +103,45 @@ public class Extractor {
 
         // Step 5: Assign the method name, parameters, and return type to each method declaration
         // TODO: Implement this step, e.g., using GPT fine-tuning
-        extractedMethods.forEach(method -> {
-            method.setExtractedMethodName("extractedMethod");
-            method.setExtractedMethodParameters(new ArrayList<>());
-            method.setExtractedMethodReturnType(PrimitiveType.VOID);
-            System.out.println(method.getExtractedMethodDeclaration());
+        extractedMethods.forEach(em -> {
+            em.setExtractedMethodName("extractedMethod");
+            em.setExtractedMethodParameters(new ArrayList<>());
+            em.setExtractedMethodReturnType(PrimitiveType.VOID);
         });
 
-        // Step 6: Finding the Target class
-        // Calculate LCOM for all candidate classes
+        // Step 6: Finding the Target class for each opportunity
+        Map<MethodDeclaration, Map<Type, Double>> extractionImprovements = new HashMap<>(); // <extracted method declaration, <target class, improvement>>
         List<Type> candidateClasses = getCandidateClasses();
-        Map<Type, Double> class2LCOM = new HashMap<>();
-        candidateClasses.forEach(type -> {
-            BaseLCOM lcomCalculator = new LCOM2Calculator();
-            class2LCOM.put(type, lcomCalculator.getValue(type.getNodeAsTypeDeclaration()));
-        });
-        // TODO: Implement this step, e.g., LCOM
-
+        for (ExtractedMethod em : extractedMethods) {
+            MethodDeclaration extractedMethodDeclaration = em.getExtractedMethodDeclaration();
+            System.out.println("===== Extracted Method =====");
+            System.out.println(extractedMethodDeclaration);
+            for (Type candidateTargetClass : candidateClasses) {
+                RefactoringEvaluator evaluator = new RefactoringEvaluator(this.getSourceFileDirectory(), this.belongingType.getNodeAsTypeDeclaration(), candidateTargetClass.getNodeAsTypeDeclaration(), extractedMethodDeclaration, em.getRefactoredTypeCU());
+                try {
+                    evaluator.evaluate();
+                    evaluator.printEvaluation();
+                    // update results
+                    Double improvement = evaluator.getLCOMImprovement();
+                    extractionImprovements.putIfAbsent(extractedMethodDeclaration, new HashMap<>());
+                    extractionImprovements.get(extractedMethodDeclaration).put(candidateTargetClass, improvement);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("*** Best Target Class: " + extractionImprovements.get(extractedMethodDeclaration).entrySet().stream().max(Comparator.comparingDouble(Map.Entry::getValue)).get().getKey().getNodeAsTypeDeclaration().getName().getIdentifier());
+        }
+        // TODO: add results to the output json file
     }
 
     /**
      * Get all candidate classes in the same package who may be the target class to move the extracted method to.
+     *
      * @return All candidate classes in the same package
      */
     private List<Type> getCandidateClasses() {
-        // get file path from source file
-        String filePath = sourceFile.getAbsolutePath();
-        // get its directory path
-        String dirPath = filePath.substring(0, filePath.lastIndexOf(File.separator));
         // find the target type declaration by identifier
-        JavaFilesFinder finder = new JavaFilesFinder(dirPath);
+        JavaFilesFinder finder = new JavaFilesFinder(this.getSourceFileDirectory().toString());
         try {
             SourceFilesLoader loader = new SourceFilesLoader(finder);
             return loader.getLoadedSourceFiles().stream()
@@ -143,5 +151,9 @@ public class Extractor {
         } catch (IOException e) {
             return new ArrayList<>();
         }
+    }
+
+    private Path getSourceFileDirectory() {
+        return sourceFile.toPath().getParent();
     }
 }
