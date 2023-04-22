@@ -1,6 +1,5 @@
 package cmu.csdetector.extractor;
 
-import cmu.csdetector.metrics.calculators.type.BaseLCOM;
 import cmu.csdetector.metrics.calculators.type.LCOM3Calculator;
 import cmu.csdetector.resources.Type;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
@@ -202,8 +201,12 @@ public class RefactoringEvaluator {
         return refactoredTargetClassLCOM;
     }
 
-    public Double getLCOMImprovement() {
-        return (originalSourceClassLCOM + originalTargetClassLCOM) - (refactoredSourceClassLCOM + refactoredTargetClassLCOM);
+    /**
+     * Calculate the benefit of the refactoring in terms of LCOM reduction (lower is better)
+     * @return LCOM reduction
+     */
+    public Double getLCOMReduction() {
+        return (refactoredSourceClassLCOM + refactoredTargetClassLCOM) - (originalSourceClassLCOM + originalTargetClassLCOM);
     }
 
     public void printEvaluation() {
@@ -212,7 +215,7 @@ public class RefactoringEvaluator {
         System.out.println("    Target class LCOM before refactoring: " + originalTargetClassLCOM);
         System.out.println("    Source class LCOM after refactoring: " + refactoredSourceClassLCOM);
         System.out.println("    Target class LCOM after refactoring: " + refactoredTargetClassLCOM);
-        System.out.println("        LCOM improvement: " + getLCOMImprovement());
+        System.out.println("        LCOM reduction (improvement): " + getLCOMReduction());
         System.out.println();
     }
 }

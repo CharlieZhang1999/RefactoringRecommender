@@ -120,11 +120,15 @@ public class Extractor {
                 RefactoringEvaluator evaluator = new RefactoringEvaluator(this.getSourceFileDirectory(), this.belongingType.getNodeAsTypeDeclaration(), candidateTargetClass.getNodeAsTypeDeclaration(), extractedMethodDeclaration, em.getRefactoredTypeCU());
                 try {
                     evaluator.evaluate();
+                    Double reduction = evaluator.getLCOMReduction(); // the larger the better
+                    if (reduction <= 0) { // negative refactoring
+                        System.out.println("Skip negative refactoring: " + candidateTargetClass.getNodeAsTypeDeclaration().getName().getIdentifier());
+                        continue;
+                    }
                     evaluator.printEvaluation();
                     // update results
-                    Double improvement = evaluator.getLCOMImprovement();
                     extractionImprovements.putIfAbsent(extractedMethodDeclaration, new HashMap<>());
-                    extractionImprovements.get(extractedMethodDeclaration).put(candidateTargetClass, improvement);
+                    extractionImprovements.get(extractedMethodDeclaration).put(candidateTargetClass, reduction);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
