@@ -104,6 +104,7 @@ public class Extractor {
         // Step 5: Assign the method name, parameters, and return type to each method declaration
         // TODO: Implement this step, e.g., using GPT fine-tuning
         extractedMethods.forEach(em -> {
+            String methodBody = em.getExtractedMethodDeclaration().getBody().toString();
             em.setExtractedMethodName("extractedMethod");
             em.setExtractedMethodParameters(new ArrayList<>());
             em.setExtractedMethodReturnType(PrimitiveType.VOID);

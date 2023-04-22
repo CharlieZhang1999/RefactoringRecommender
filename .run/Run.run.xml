@@ -11,7 +11,7 @@
       <option name="taskNames">
         <list>
           <option value="run" />
-          <option value="--args=&quot;-sf $PROJECT_DIR$/smells_output.json -src $PROJECT_DIR$/src&quot;" />
+          <option value="--args=&quot;-sf $PROJECT_DIR$/../../../../'2023 Spring'/18664/GroupProject/SmellDetector/smells_output.json -src $PROJECT_DIR$/../../../../'2023 Spring'/18664/GroupProject/SmellDetector/examples/ComplexClass&quot;" />
         </list>
       </option>
       <option name="vmOptions" />

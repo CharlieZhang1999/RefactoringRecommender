@@ -2,18 +2,80 @@
   {
     "methods": [],
     "sourceFile": {
-      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ArchiveFileSet.java"
+      "fileRelativePath": "examples/ComplexClass/src/main/java/paper/example/FileSet.java"
+    },
+    "fullyQualifiedName": "paper.example.FileSet",
+    "metricsValues": {
+      "PublicFieldCount": 0.0,
+      "ClassLinesOfCode": 1.0,
+      "TightClassCohesion": 1.0,
+      "OverrideRatio": 0.5,
+      "WeighOfClass": 0.0,
+      "NumberOfAccessorMethods": 0.0,
+      "WeightedMethodCount": 0.0,
+      "IsAbstract": 0.0,
+      "LCOM2": 0.0
+    },
+    "kind": "public class",
+    "smells": []
+  },
+  {
+    "methods": [
+      {
+        "parametersTypes": [],
+        "sourceFile": {
+          "fileRelativePath": "examples/ComplexClass/src/main/java/paper/example/Resource.java"
+        },
+        "fullyQualifiedName": "paper.example.Resource.getName",
+        "metricsValues": {
+          "MethodLinesOfCode": 2.0,
+          "CouplingIntensity": 0.0,
+          "ChangingClasses": 1.0,
+          "NumberOfAccessedVariables": 1.0,
+          "MaxCallChain": 0.0,
+          "MaxNesting": 0.0,
+          "CouplingDispersion": 0.0,
+          "ChangingMethods": 1.0,
+          "CyclomaticComplexity": 1.0,
+          "ParameterCount": 0.0
+        },
+        "kind": "public method",
+        "smells": []
+      }
+    ],
+    "sourceFile": {
+      "fileRelativePath": "examples/ComplexClass/src/main/java/paper/example/Resource.java"
+    },
+    "fullyQualifiedName": "paper.example.Resource",
+    "metricsValues": {
+      "PublicFieldCount": 1.0,
+      "ClassLinesOfCode": 4.0,
+      "TightClassCohesion": 1.0,
+      "OverrideRatio": null,
+      "WeighOfClass": 0.0,
+      "NumberOfAccessorMethods": 1.0,
+      "WeightedMethodCount": 1.0,
+      "IsAbstract": 0.0,
+      "LCOM2": 0.0
+    },
+    "kind": "public class",
+    "smells": []
+  },
+  {
+    "methods": [],
+    "sourceFile": {
+      "fileRelativePath": "examples/ComplexClass/src/main/java/paper/example/ArchiveFileSet.java"
     },
     "fullyQualifiedName": "paper.example.ArchiveFileSet",
     "metricsValues": {
-      "NumberOfAccessorMethods": 0.0,
-      "WeighOfClass": 0.0,
-      "OverrideRatio": null,
-      "WeightedMethodCount": 0.0,
+      "PublicFieldCount": 0.0,
       "ClassLinesOfCode": 1.0,
       "TightClassCohesion": 1.0,
+      "OverrideRatio": null,
+      "WeighOfClass": 0.0,
+      "NumberOfAccessorMethods": 0.0,
+      "WeightedMethodCount": 0.0,
       "IsAbstract": 0.0,
-      "PublicFieldCount": 0.0,
       "LCOM2": 0.0
     },
     "kind": "public class",
@@ -26,20 +88,20 @@
           "Resource[]"
         ],
         "sourceFile": {
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+          "fileRelativePath": "examples/ComplexClass/src/main/java/paper/example/ComplexClass.java"
         },
         "fullyQualifiedName": "paper.example.ComplexClass.gradManifests",
         "metricsValues": {
+          "MethodLinesOfCode": 25.0,
           "CouplingIntensity": 4.0,
-          "NumberOfAccessedVariables": 10.0,
           "ChangingClasses": 0.0,
-          "ParameterCount": 1.0,
-          "CyclomaticComplexity": 12.0,
+          "NumberOfAccessedVariables": 10.0,
           "MaxCallChain": 3.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 0.5,
           "MaxNesting": 6.0,
-          "MethodLinesOfCode": 25.0
+          "CouplingDispersion": 0.5,
+          "ChangingMethods": 0.0,
+          "CyclomaticComplexity": 12.0,
+          "ParameterCount": 1.0
         },
         "kind": "public method",
         "smells": []
@@ -49,20 +111,20 @@
           "FileSet[]"
         ],
         "sourceFile": {
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+          "fileRelativePath": "examples/ComplexClass/src/main/java/paper/example/ComplexClass.java"
         },
         "fullyQualifiedName": "paper.example.ComplexClass.grabRes",
         "metricsValues": {
+          "MethodLinesOfCode": 2.0,
           "CouplingIntensity": 0.0,
-          "NumberOfAccessedVariables": 1.0,
           "ChangingClasses": 1.0,
-          "ParameterCount": 1.0,
-          "CyclomaticComplexity": 1.0,
+          "NumberOfAccessedVariables": 1.0,
           "MaxCallChain": 0.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
           "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0
+          "CouplingDispersion": 0.0,
+          "ChangingMethods": 1.0,
+          "CyclomaticComplexity": 1.0,
+          "ParameterCount": 1.0
         },
         "kind": "public method",
         "smells": []
@@ -72,20 +134,20 @@
           "Resource[]"
         ],
         "sourceFile": {
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+          "fileRelativePath": "examples/ComplexClass/src/main/java/paper/example/ComplexClass.java"
         },
         "fullyQualifiedName": "paper.example.ComplexClass.grabNonFileSetRes",
         "metricsValues": {
+          "MethodLinesOfCode": 2.0,
           "CouplingIntensity": 0.0,
-          "NumberOfAccessedVariables": 1.0,
           "ChangingClasses": 1.0,
-          "ParameterCount": 1.0,
-          "CyclomaticComplexity": 1.0,
+          "NumberOfAccessedVariables": 1.0,
           "MaxCallChain": 0.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
           "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0
+          "CouplingDispersion": 0.0,
+          "ChangingMethods": 1.0,
+          "CyclomaticComplexity": 1.0,
+          "ParameterCount": 1.0
         },
         "kind": "public method",
         "smells": []
@@ -93,38 +155,38 @@
       {
         "parametersTypes": [],
         "sourceFile": {
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+          "fileRelativePath": "examples/ComplexClass/src/main/java/paper/example/ComplexClass.java"
         },
         "fullyQualifiedName": "paper.example.ComplexClass.getProj",
         "metricsValues": {
+          "MethodLinesOfCode": 2.0,
           "CouplingIntensity": 0.0,
-          "NumberOfAccessedVariables": 0.0,
           "ChangingClasses": 1.0,
-          "ParameterCount": 0.0,
-          "CyclomaticComplexity": 1.0,
+          "NumberOfAccessedVariables": 0.0,
           "MaxCallChain": 0.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
           "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0
+          "CouplingDispersion": 0.0,
+          "ChangingMethods": 1.0,
+          "CyclomaticComplexity": 1.0,
+          "ParameterCount": 0.0
         },
         "kind": "public method",
         "smells": []
       }
     ],
     "sourceFile": {
-      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+      "fileRelativePath": "examples/ComplexClass/src/main/java/paper/example/ComplexClass.java"
     },
     "fullyQualifiedName": "paper.example.ComplexClass",
     "metricsValues": {
-      "NumberOfAccessorMethods": 1.0,
-      "WeighOfClass": 0.75,
-      "OverrideRatio": null,
-      "WeightedMethodCount": 15.0,
+      "PublicFieldCount": 0.0,
       "ClassLinesOfCode": 33.0,
       "TightClassCohesion": 0.0,
+      "OverrideRatio": null,
+      "WeighOfClass": 0.75,
+      "NumberOfAccessorMethods": 1.0,
+      "WeightedMethodCount": 15.0,
       "IsAbstract": 0.0,
-      "PublicFieldCount": 0.0,
       "LCOM2": 0.75
     },
     "kind": "public class",
@@ -136,67 +198,5 @@
         "endingLine": 53
       }
     ]
-  },
-  {
-    "methods": [],
-    "sourceFile": {
-      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\FileSet.java"
-    },
-    "fullyQualifiedName": "paper.example.FileSet",
-    "metricsValues": {
-      "NumberOfAccessorMethods": 0.0,
-      "WeighOfClass": 0.0,
-      "OverrideRatio": 0.5,
-      "WeightedMethodCount": 0.0,
-      "ClassLinesOfCode": 1.0,
-      "TightClassCohesion": 1.0,
-      "IsAbstract": 0.0,
-      "PublicFieldCount": 0.0,
-      "LCOM2": 0.0
-    },
-    "kind": "public class",
-    "smells": []
-  },
-  {
-    "methods": [
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\Resource.java"
-        },
-        "fullyQualifiedName": "paper.example.Resource.getName",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 1.0,
-          "ParameterCount": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "MaxCallChain": 0.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0
-        },
-        "kind": "public method",
-        "smells": []
-      }
-    ],
-    "sourceFile": {
-      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\Resource.java"
-    },
-    "fullyQualifiedName": "paper.example.Resource",
-    "metricsValues": {
-      "NumberOfAccessorMethods": 1.0,
-      "WeighOfClass": 0.0,
-      "OverrideRatio": null,
-      "WeightedMethodCount": 1.0,
-      "ClassLinesOfCode": 4.0,
-      "TightClassCohesion": 1.0,
-      "IsAbstract": 0.0,
-      "PublicFieldCount": 1.0,
-      "LCOM2": 0.0
-    },
-    "kind": "public class",
-    "smells": []
   }
 ]
