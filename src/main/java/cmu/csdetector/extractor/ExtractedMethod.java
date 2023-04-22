@@ -121,18 +121,20 @@ public class ExtractedMethod {
 
         int methodBodySize = methodBody.statements().size();
         switch (methodBodySize) {
-            case 0 -> {
+            case 0:
                 // if the method body is empty, then explicitly set to null, which should be dropped later
                 extractedMethodDeclaration = null;
                 return;
-            }
-            case 1 -> {
+
+            case 1:
                 // if the method body only contains one statement, then directly use the statement as the method body
                 extractedMethodDeclaration.setBody(this.cloneBlock(ast, (Block) methodBody.statements().get(0)));
-            }
-            default -> {
+                break;
+
+            default:
                 extractedMethodDeclaration.setBody(methodBody);
-            }
+                break;
+
         }
 
         // update the end line number
