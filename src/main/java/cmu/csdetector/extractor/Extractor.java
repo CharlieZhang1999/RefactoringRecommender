@@ -175,7 +175,7 @@ public class Extractor {
                 RefactoringEvaluator evaluator = new RefactoringEvaluator(this.getSourceFileDirectory(), this.belongingType.getNodeAsTypeDeclaration(), candidateTargetClass.getNodeAsTypeDeclaration(), extractedMethodDeclaration, em.getRefactoredTypeCU());
                 try {
                     evaluator.evaluate();
-                    Double reduction = evaluator.getLCOMReduction(); // the larger the better
+                    Double reduction = evaluator.getLCOMReduction(); // the larger, the better
                     if (reduction <= 0) { // negative refactoring
                         System.out.println("Skip negative refactoring: " + candidateTargetClass.getNodeAsTypeDeclaration().getName().getIdentifier());
                         continue;
@@ -187,6 +187,10 @@ public class Extractor {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+            if (extractionImprovements.get(extractedMethodDeclaration) == null || extractionImprovements.get(extractedMethodDeclaration).isEmpty()) {
+                System.out.println("No positive refactoring found for this extracted method.");
+                continue;
             }
             System.out.println("*** Best Target Class: " + extractionImprovements.get(extractedMethodDeclaration).entrySet().stream().max(Comparator.comparingDouble(Map.Entry::getValue)).get().getKey().getNodeAsTypeDeclaration().getName().getIdentifier());
         }
