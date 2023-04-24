@@ -1,13 +1,12 @@
 package cmu.csdetector.extractor;
 
+import cmu.csdetector.ast.visitors.MethodCollector;
+import org.eclipse.jdt.core.dom.*;
 import cmu.csdetector.resources.Method;
 import cmu.csdetector.resources.Resource;
 import cmu.csdetector.resources.Type;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
 import cmu.csdetector.resources.loader.SourceFilesLoader;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.PrimitiveType;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class Extractor {
      * The visitor to build statement table
      */
     private final StatementVisitor statementVisitor = new StatementVisitor();
-
+    private final MethodVariableCollector methodVariableCollector = new MethodVariableCollector();
     /**
      * Constructor for a class
      */
@@ -60,9 +59,19 @@ public class Extractor {
         this.sourceFile = resource.getSourceFile().getFile();
     }
 
+    private Boolean isBetween(CompilationUnit cu, ASTNode node, int startLineNumber, int endLineNUmber) {
+        int start = cu.getLineNumber(node.getStartPosition());
+        int end = cu.getLineNumber(node.getStartPosition() + node.getLength());
+
+        return startLineNumber <= start && end <= endLineNUmber;
+    }
+
     public void extract() {
         // Step 1: Accept the visitor to build the statement table
         resource.getNode().accept(statementVisitor);
+//        if(resource instanceof Method){
+//            resource.getNode().accept(Met);
+//        }
         SortedMap<Integer, Set<String>> statementsTable = statementVisitor.getLineNumToStatementsTable(cu);
 
         // Step 2: Extract the opportunities for each step
@@ -104,7 +113,52 @@ public class Extractor {
         // Step 5: Assign the method name, parameters, and return type to each method declaration
         // TODO: Implement this step, e.g., using GPT fine-tuning
         extractedMethods.forEach(em -> {
+            MethodDeclaration method;
+            if (this.resource instanceof Method) {
+                method = (MethodDeclaration) this.resource.getNode();
+            } else {
+                CompilationUnit cu = this.resource.getSourceFile().getCompilationUnit();
+                MethodCollector collector = new MethodCollector();
+                this.resource.getNode().accept(collector);
+                List<MethodDeclaration> methods = collector.getNodesCollected();
+                method = null;
+                for (MethodDeclaration md: methods) {
+
+                    int start = cu.getLineNumber(md.getStartPosition()) - 1;
+                    int end = cu.getLineNumber(md.getStartPosition() + md.getLength()) - 1;
+                    if (em.getLineRange()[0] >= start && em.getLineRange()[1] <= end) {
+                        method = md;
+                        break;
+                    }
+                }
+            }
+            List<SimpleName> arr = new ArrayList<>();
+            if (method == null) {
+                System.out.println("Method not found!");
+            } else {
+                method.accept(methodVariableCollector);
+                arr = methodVariableCollector.getNodesCollected();
+            }
+            List<String> declared = new ArrayList<>();
+            List<String> used = new ArrayList<>();
+            for (SimpleName sn: arr) {
+                if (isBetween(cu, sn, em.getLineRange()[0], em.getLineRange()[1])) {
+                    if (sn.isDeclaration()) {
+                        declared.add(sn.getIdentifier());
+                    } else {
+                        used.add(sn.getIdentifier());
+                    }
+                }
+            }
+            List<String> params = new ArrayList<>();
+            for (String id: used) {
+                if ((!declared.contains(id)) && (!params.contains(id))) {
+                    params.add(id);
+                }
+            }
+
             String methodBody = em.getExtractedMethodDeclaration().getBody().toString();
+            SignatureRecommender recommender = new SignatureRecommender(em);
             em.setExtractedMethodName("extractedMethod");
             em.setExtractedMethodParameters(new ArrayList<>());
             em.setExtractedMethodReturnType(PrimitiveType.VOID);
