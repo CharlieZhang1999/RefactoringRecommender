@@ -108,7 +108,7 @@ public class ExtractedMethod {
             // then we need to read the next line to complete the block
             int i = newEndLine + 1;
             for (; i < this.maxLineNum && stmt.statements().isEmpty(); i++) {
-                statementStr += this.readLineByNumber(i);
+                statementStr = statementStr + "\n" + this.readLineByNumber(i);
                 stmt = this.cloneBlock(ast, (Block) this.buildStatementFromString(statementStr));
             }
             newEndLine = i - 1;
@@ -378,4 +378,5 @@ public class ExtractedMethod {
         this.deleteJavaFile(refactoredClassName + ".java");
         this.deleteJavaFile(opportunityClassName + ".java");
     }
+
 }

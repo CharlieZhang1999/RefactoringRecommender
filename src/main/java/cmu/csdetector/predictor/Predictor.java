@@ -15,15 +15,15 @@ public class Predictor {
 	private int maxTokens;
 	private double temperature;
 	private String apiKey;
-	
+
 	public Predictor(String model, double temperature, String apiKey, int maxTokens) {
 		this.model = model;
 		this.maxTokens = maxTokens;
 		this.temperature = temperature;
 		this.apiKey = apiKey;
 	}
-    
-	
+
+
 	/**
 
 		Sends a completion request to the OpenAI API using the specified prompt and returns the text response of the model.
@@ -32,7 +32,7 @@ public class Predictor {
 		@throws IOException if there is an error sending the completion request or reading the response
 	*/
     public String getCompletion(String prompt) throws IOException {
-  
+
         String url = "https://api.openai.com/v1/" + model + "/completions";
         String stop = "\n";
 
@@ -43,7 +43,7 @@ public class Predictor {
                 + "\"temperature\": " + this.temperature + ","
                 + "\"stop\": \"" + stop + "\""
                 + "}";
-        
+
         URL urlObj = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) urlObj.openConnection();
         conn.setRequestMethod("POST");
@@ -63,12 +63,12 @@ public class Predictor {
             response.append(inputLine);
         }
         in.close();
-        
+
         String messageContent = parseResponseJSON(response.toString());
 
         return messageContent;
     }
-    
+
     public String buildPrompt(String methodBody) {
     	return "You are an AI model designed to understand"
     			+ " java code. You will be given a snippet of "
@@ -83,7 +83,7 @@ public class Predictor {
     			+ "Now return only the suggested name for the method "
     			+ "based on the method body";
     }
-    
+
     public String predictMethodName(String methodBody) throws IOException {
     	String prompt = this.buildPrompt(methodBody);
     	try {
@@ -92,7 +92,7 @@ public class Predictor {
 			throw e;
 		}
     }
-    
+
     private static String parseResponseJSON(String responseJSON) {
         JSONObject jsonResponse = new JSONObject(responseJSON);
         JSONArray choicesArray = jsonResponse.getJSONArray("choices");

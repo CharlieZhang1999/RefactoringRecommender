@@ -39,6 +39,8 @@ public class Extractor {
      */
     private final StatementVisitor statementVisitor = new StatementVisitor();
     private final MethodVariableCollector methodVariableCollector = new MethodVariableCollector();
+
+    private final MethodAssignmentCollector methodAssignmentCollector = new MethodAssignmentCollector();
     /**
      * Constructor for a class
      */
@@ -64,6 +66,12 @@ public class Extractor {
         int end = cu.getLineNumber(node.getStartPosition() + node.getLength());
 
         return startLineNumber <= start && end <= endLineNUmber;
+    }
+
+    private Boolean isAfter(CompilationUnit cu, ASTNode node, int LineNUmber) {
+        int start = cu.getLineNumber(node.getStartPosition());
+
+        return start > LineNUmber;
     }
 
     public void extract() {
@@ -132,28 +140,48 @@ public class Extractor {
                     }
                 }
             }
-            List<SimpleName> arr = new ArrayList<>();
+            List<SimpleName> variables = new ArrayList<>();
+            List<SimpleName> assignments = new ArrayList<>();
             if (method == null) {
                 System.out.println("Method not found!");
             } else {
                 method.accept(methodVariableCollector);
-                arr = methodVariableCollector.getNodesCollected();
+                variables = methodVariableCollector.getNodesCollected();
+                method.accept(methodAssignmentCollector);
+                assignments = methodAssignmentCollector.getNodesCollected();
             }
             List<String> declared = new ArrayList<>();
             List<String> used = new ArrayList<>();
-            for (SimpleName sn: arr) {
+            List<String> usedAfter = new ArrayList<>();
+            for (SimpleName sn: variables) {
                 if (isBetween(cu, sn, em.getLineRange()[0], em.getLineRange()[1])) {
                     if (sn.isDeclaration()) {
                         declared.add(sn.getIdentifier());
                     } else {
                         used.add(sn.getIdentifier());
                     }
+                } else if (isAfter(cu, sn, em.getLineRange()[1])) {
+                    usedAfter.add(sn.getIdentifier());
                 }
             }
+            List<String> assigned = new ArrayList<>();
+            for (SimpleName sn: assignments) {
+                if (isBetween(cu, sn, em.getLineRange()[0], em.getLineRange()[1])) {
+                    assigned.add(sn.getIdentifier());
+                }
+            }
+
             List<String> params = new ArrayList<>();
             for (String id: used) {
-                if ((!declared.contains(id)) && (!params.contains(id))) {
+                if (((!declared.contains(id)) && (!params.contains(id))) && (em.getExtractedMethodDeclaration().toString().contains(id))){
                     params.add(id);
+                }
+            }
+
+            List<String> returns = new ArrayList<>();
+            for (String id: assigned) {
+                if ((usedAfter.contains(id) && (!returns.contains(id))) && (em.getExtractedMethodDeclaration().toString().contains(id))){
+                    returns.add(id);
                 }
             }
 
