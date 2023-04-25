@@ -12,37 +12,37 @@ import org.json.JSONObject;
 
 public class Predictor {
 
-	private String model;
-	private int maxTokens;
-	private double temperature;
-	private String apiKey;
+    private String model;
+    private int maxTokens;
+    private double temperature;
+    private String apiKey;
 
-	public Predictor(String model, double temperature, String apiKey, int maxTokens) {
-		this.model = model;
-		this.maxTokens = maxTokens;
-		this.temperature = temperature;
-		this.apiKey = apiKey;
-	}
+    public Predictor(String model, double temperature, String apiKey, int maxTokens) {
+        this.model = model;
+        this.maxTokens = maxTokens;
+        this.temperature = temperature;
+        this.apiKey = apiKey;
+    }
 
 
-	/**
-
-		Sends a completion request to the OpenAI API using the specified prompt and returns the text response of the model.
-		@param prompt the prompt to send to the model
-		@return the text response of the model
-		@throws IOException if there is an error sending the completion request or reading the response
-	*/
+    /**
+     * Sends a completion request to the OpenAI API using the specified prompt and returns the text response of the model.
+     *
+     * @param prompt the prompt to send to the model
+     * @return the text response of the model
+     * @throws IOException if there is an error sending the completion request or reading the response
+     */
     public String getCompletion(String prompt) throws IOException {
 
-        String url = "https://api.openai.com/v1/" + model + "/completions";
-        String stop = "\n";
+        String url = "https://api.openai.com/v1/completions";
+//        String stop = "\\n";
 
         String payload = "{"
                 + "\"model\": \"" + this.model + "\","
                 + "\"prompt\": \"" + prompt + "\","
                 + "\"max_tokens\": " + this.maxTokens + ","
-                + "\"temperature\": " + this.temperature + ","
-                + "\"stop\": \"" + stop + "\""
+                + "\"temperature\": " + this.temperature
+//                + "\"stop\": \"" + stop + "\""
                 + "}";
 
         URL urlObj = new URL(url);
@@ -57,7 +57,13 @@ public class Predictor {
         os.flush();
         os.close();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        BufferedReader in;
+        if (conn.getResponseCode() >= 400) {
+            in = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+        } else {
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        }
+
         String inputLine;
         StringBuilder response = new StringBuilder();
         while ((inputLine = in.readLine()) != null) {
@@ -65,33 +71,42 @@ public class Predictor {
         }
         in.close();
 
+        if (conn.getResponseCode() >= 400) {
+            String errorMessage = response.toString();
+            System.out.println("Error message: " + errorMessage);
+            throw new IOException(errorMessage);
+        } else {
+            String successMessage = response.toString();
+            System.out.println("Success message: " + successMessage);
+        }
+
         String messageContent = parseResponseJSON(response.toString());
 
         return messageContent;
     }
 
     public String buildPrompt(String methodBody) {
-    	return "You are an AI model designed to understand"
-    			+ " java code. You will be given a snippet of "
-    			+ "a method body in Java and your ONLY job is to analyze "
-    			+ "that method body and suggest one suitable name for that method."
-    			+ " You will return only the suggested name for the method based "
-    			+ "on the method body. Your response must not be justifications"
-    			+ " of your answer. only the method name. You must put the suggested "
-    			+ "method body name in quotes and return it.\n\n"
-    			+ "Here is the method body:\n\n ```" + methodBody
-    			+ "\n\n```"
-    			+ "Now return only the suggested name for the method "
-    			+ "based on the method body";
+        return "You are an AI model designed to understand"
+                + " java code. You will be given a snippet of "
+                + "a method body in Java and your ONLY job is to analyze "
+                + "that method body and suggest one suitable name for that method."
+                + " You will return only the suggested name for the method based "
+                + "on the method body. Your response must not be justifications"
+                + " of your answer. only the method name. You must put the suggested "
+                + "method body name in quotes and return it.  \\n \\n  "
+                + "Here is the method body: \\n \\n    ```" + methodBody
+                + "   ``` \\n \\n ";
     }
 
     public String predictMethodName(String methodBody) throws IOException {
-    	String prompt = this.buildPrompt(methodBody);
-    	try {
-			return this.getCompletion(prompt);
-		} catch (IOException e) {
-			throw e;
-		}
+        String methodBodyJson = methodBody.replace("\"", "\\\"").replace("\n", "\\n");
+        String prompt = this.buildPrompt(methodBodyJson);
+        try {
+            String responseText = this.getCompletion(prompt);
+            return responseText.replaceAll("[\\p{Punct}]", " ").replace("\n", " ").trim();
+        } catch (IOException e) {
+            throw e;
+        }
     }
 
     private static String parseResponseJSON(String responseJSON) {
@@ -99,7 +114,6 @@ public class Predictor {
         JSONArray choicesArray = jsonResponse.getJSONArray("choices");
         JSONObject choiceObject = choicesArray.getJSONObject(0);
 
-        return choiceObject.getString("text").trim();
+        return choiceObject.getString("text");
     }
 }
-

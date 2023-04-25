@@ -1,6 +1,7 @@
 package cmu.csdetector.extractor;
 
 import cmu.csdetector.ast.visitors.MethodCollector;
+import cmu.csdetector.predictor.Predictor;
 import org.eclipse.jdt.core.dom.*;
 import cmu.csdetector.resources.Method;
 import cmu.csdetector.resources.Resource;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.json.JSONObject;
 
 /**
  * The main pipeline for extracting opportunities for a given target resource.
@@ -118,7 +120,6 @@ public class Extractor {
         extractedMethods = opportunityProcessor.process(); // processed opportunities
 
         // Step 5: Assign the method name, parameters, and return type to each method declaration
-        // TODO: Implement this step, e.g., using GPT fine-tuning
         extractedMethods.forEach(em -> {
             MethodDeclaration method = null;
             if (this.resource instanceof Method) {
@@ -181,7 +182,6 @@ public class Extractor {
 
             List<SingleVariableDeclaration> paramsWithType = params.stream().map( p -> {
                 ITypeBinding typeBinding = p.resolveTypeBinding();
-                String name = typeBinding.getName();
                 SingleVariableDeclaration vd = ast.newSingleVariableDeclaration();
                 vd.setType(constructTypeFromString(typeBinding.getName(), ast));
                 vd.setName(ast.newSimpleName(p.getIdentifier()));
@@ -196,9 +196,9 @@ public class Extractor {
             }
 
             org.eclipse.jdt.core.dom.Type returnType = ast.newPrimitiveType(PrimitiveType.VOID);
-            if(returns.size() == 1){
+            if (returns.size() == 1) {
                 returnType = constructTypeFromString(returns.get(0).getIdentifier(), ast);
-            } else {
+            } else if(returns.size() > 1) {
                 System.out.println("You can return one of the following: [");
                 for (SimpleName sn: returns) {
                     System.out.print(sn.getIdentifier() + " ");
@@ -206,12 +206,22 @@ public class Extractor {
                 System.out.print("]");
             }
 
-
             SignatureRecommender recommender = new SignatureRecommender(em, this.resource, this.cu);
             String methodBody = em.getExtractedMethodDeclaration().getBody().toString();
-            em.setExtractedMethodName("extractedMethod");
-            em.setExtractedMethodParameters(paramsWithType);
 
+            String API_KEY = "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";
+            Predictor predictor = new Predictor("text-davinci-003", 0, API_KEY, 7);
+
+            String methodName;
+            try {
+                methodName = predictor.predictMethodName(methodBody);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                methodName = "extractedMethod";
+            }
+
+            em.setExtractedMethodName(methodName);
+            em.setExtractedMethodParameters(paramsWithType);
             em.setExtractedMethodReturnType(returnType);
         });
 
