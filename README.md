@@ -34,6 +34,50 @@ FeatureEnvy is a method-level smell, where a method is making more external meth
 implementation takes a method as the input, finds all method calls from this method, and differentiates the number of
 internal and external method calls and makes comparisons.
 
+## Output Example
+
+### RefactoringExample
+
+```json
+{
+  "smells": [
+    {
+      "name": "FeatureEnvy",
+      "reason": "EXTERNAL_METHOD_CALLS to Movie (3) > INTERNAL_CALLS (0)",
+      "startingLine": 13,
+      "endingLine": 58
+    },
+    {
+      "name": "FeatureEnvy",
+      "reason": "EXTERNAL_METHOD_CALLS to Rental (9) > INTERNAL_CALLS (0)",
+      "startingLine": 13,
+      "endingLine": 58
+    },
+    {
+      "name": "FeatureEnvy",
+      "reason": "EXTERNAL_METHOD_CALLS to Tape (3) > INTERNAL_CALLS (0)",
+      "startingLine": 13,
+      "endingLine": 58
+    }
+  ]
+}
+```
+
+### ComplexClass
+
+```json
+{
+  "smells": [
+    {
+      "name": "ComplexClass",
+      "reason": "CC = 12.0",
+      "startingLine": 3,
+      "endingLine": 53
+    }
+  ]
+}
+```
+
 After collecting all smell classes and methods, we start to apply our Extractor class on smelly instances to find
 refactoring opportunities via Extract Method operation.
 
@@ -57,13 +101,74 @@ to extract variable names and method calls.
 
 For example, when visiting a `MethodInvocation` node, we can get all identifiers `a`, `b` and `c`, from expressions
 where simple names are chained together, like `a.b.c()`. In terms of `Assignment` node, we can extract all operands from
-the expression, like `a = b + c`, and get `a`, `b`
-and `c`.
+the expression, like `a = b + c`, and get `a`, `b` and `c`.
 
 Then, by using the compilation unit, we can locate the line number of each variable and method call, and build the
 statement table. The statement table is a sorted map from line number to variable and method call, which is similar to
-the TABLE 2
-example in the paper.
+the TABLE 2 example in the paper.
+
+## Output Example
+
+### RefactoringExample
+
+```text
+===== Statement Table =====
+Line Number | Statements
+         14 | totalAmount
+         15 | frequentRenterPoints
+         16 | this.rentals, iterator, this, rentals
+         17 | result, name
+         19 | hasNext, rentals, rentals.hasNext
+         20 | thisAmount
+         21 | next, rentals.next, rentals, each
+         24 | priceCode, each.getTape, getMovie, getTape, each
+         25 | Movie, REGULAR, Movie.REGULAR
+         26 | thisAmount
+         27 | daysRented, each, each.daysRented
+         28 | daysRented, thisAmount, each, each.daysRented
+         30 | NEW_RELEASE, Movie, Movie.NEW_RELEASE
+         31 | daysRented, thisAmount, each, each.daysRented
+         33 | Movie, Movie.CHILDREN, CHILDREN
+         34 | thisAmount
+         35 | daysRented, each, each.daysRented
+         36 | daysRented, thisAmount, each, each.daysRented
+         40 | totalAmount, thisAmount
+         46 | NEW_RELEASE, Movie, priceCode, daysRented, each.getTape, getMovie, Movie.NEW_RELEASE, getTape, each, each.daysRented
+         49 | result, getName, each.getTape, getMovie, getTape, each
+         53 | result, totalAmount
+         54 | result, frequentRenterPoints
+         56 | result
+```
+
+### ComplexClass
+
+```text
+===== Statement Table =====
+Line Number | Statements
+          6 | rcs, length, manifests, rcs.length
+          8 | rcs, length, i, rcs.length
+          9 | rec
+         10 | rcs, i
+         11 | rec, rcs, i, grabRes
+         12 | rcs, i
+         13 | rec, rcs, i, grabNonFileSetRes
+         15 | rec.length, rec, length, j
+         16 | rec, getName, name, replace, j
+         17 | rcs, i
+         19 | rcs, i, afs
+         20 | getFullPath, getProj, equals, afs.getFullPath, afs
+         21 | getFullPath, getProj, name, afs.getFullPath, afs
+         22 | getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs
+         23 | pr, getProj, afs.getPref, getPref, afs
+         24 | pr, endsWith, pr.endsWith
+         25 | pr
+         27 | pr, name
+         30 | name, equalsIgnoreCase, MANIFEST_NAME, name.equalsIgnoreCase
+         31 | rec, manifests, i, j
+         35 | manifests, i
+         36 | manifests, i
+         39 | manifests
+```
 
 # Step 2: Extract the opportunities for each step
 
@@ -89,6 +194,59 @@ Essentially, the `StepIterator` class is a sliding window with size `step` that 
   process.
 - The `hasNext()` method returns true if the start index is still within the statement table length.
 - The `haveOverlap()` method checks if lines within the window share any common variables or method calls.
+
+### RefactoringExample
+
+```text
+===== Statement Table =====
+Start Line | End Line | Variables
+        49 |       54 | result, getName, each.getTape, getMovie, getTape, each, result, totalAmount, result, frequentRenterPoints
+        27 |       28 | daysRented, each, each.daysRented, daysRented, thisAmount, each, each.daysRented
+        35 |       36 | daysRented, each, each.daysRented, daysRented, thisAmount, each, each.daysRented
+        53 |       54 | result, totalAmount, result, frequentRenterPoints
+        21 |       24 | next, rentals.next, rentals, each, priceCode, each.getTape, getMovie, getTape, each
+        46 |       49 | NEW_RELEASE, Movie, priceCode, daysRented, each.getTape, getMovie, Movie.NEW_RELEASE, getTape, each, each.daysRented, result, getName, each.getTape, getMovie, getTape, each
+        36 |       40 | daysRented, thisAmount, each, each.daysRented, totalAmount, thisAmount
+        49 |       53 | result, getName, each.getTape, getMovie, getTape, each, result, totalAmount
+```
+
+### ComplexClass
+
+```text
+===== Opportunities =====
+Start Line | End Line | Variables
+        10 |       11 | rcs, i, rec, rcs, i, grabRes
+        12 |       13 | rcs, i, rec, rcs, i, grabNonFileSetRes
+        20 |       21 | getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs
+        22 |       23 | getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs, pr, getProj, afs.getPref, getPref, afs
+        24 |       25 | pr, endsWith, pr.endsWith, pr
+         6 |        8 | rcs, length, manifests, rcs.length, rcs, length, i, rcs.length
+        10 |       12 | rcs, i, rec, rcs, i, grabRes, rcs, i
+        13 |       16 | rec, rcs, i, grabNonFileSetRes, rec.length, rec, length, j, rec, getName, name, replace, j
+        10 |       13 | rcs, i, rec, rcs, i, grabRes, rcs, i, rec, rcs, i, grabNonFileSetRes
+        20 |       22 | getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs
+        19 |       22 | rcs, i, afs, getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs
+        20 |       23 | getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs, pr, getProj, afs.getPref, getPref, afs
+        24 |       27 | pr, endsWith, pr.endsWith, pr, pr, name
+        23 |       27 | pr, getProj, afs.getPref, getPref, afs, pr, endsWith, pr.endsWith, pr, pr, name
+        31 |       36 | rec, manifests, i, j, manifests, i, manifests, i
+        11 |       12 | rec, rcs, i, grabRes, rcs, i
+        15 |       16 | rec.length, rec, length, j, rec, getName, name, replace, j
+        19 |       20 | rcs, i, afs, getFullPath, getProj, equals, afs.getFullPath, afs
+        21 |       22 | getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs
+        23 |       24 | pr, getProj, afs.getPref, getPref, afs, pr, endsWith, pr.endsWith
+        35 |       36 | manifests, i, manifests, i
+        13 |       15 | rec, rcs, i, grabNonFileSetRes, rec.length, rec, length, j
+        17 |       19 | rcs, i, rcs, i, afs
+        25 |       27 | pr, pr, name
+        27 |       30 | pr, name, name, equalsIgnoreCase, MANIFEST_NAME, name.equalsIgnoreCase
+        31 |       35 | rec, manifests, i, j, manifests, i
+        11 |       13 | rec, rcs, i, grabRes, rcs, i, rec, rcs, i, grabNonFileSetRes
+        19 |       21 | rcs, i, afs, getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs
+        21 |       23 | getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs, pr, getProj, afs.getPref, getPref, afs
+        23 |       25 | pr, getProj, afs.getPref, getPref, afs, pr, endsWith, pr.endsWith, pr
+        19 |       23 | rcs, i, afs, getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs, pr, getProj, afs.getPref, getPref, afs
+```
 
 # Step 3: Create method declarations for all opportunities
 
@@ -184,7 +342,8 @@ We also applied the helper function `constructTypeFromString()` to obtain the ty
 
 - Location: `src/main/java/cmu/csdetector/extractor/RefactoringEvaluator.java`
 - Input: `List<ExtractedMethod> extractedMethods` from Step 5
-- Output: ???
+- Output: `Map<MethodDeclaration, Map<Type, Double>> extractionImprovements` a map of extracted method to a map of
+  candidate class to the LCOM improvement
 
 Before finding the target class, we need to get all candidate classes in the same package who may be the target class to
 move the extracted method to.
@@ -208,6 +367,85 @@ After getting the LCOM metrics before and after refactoring, as the lower LCOM m
 to get the reduction in LCOM metric. This reduction is the benefit of the refactoring, the larger, the better.
 
 For each extracted method, we find the candidate class with the largest benefit and decide the target class for this opportunity.
+
+## Output Example
+
+### RefactoringExample
+
+```text
+===== Extracted Method =====
+public String calculateRental(String result,Rental each,double thisAmount,double totalAmount,int frequentRenterPoints){
+  result+="\t" + each.getTape().getMovie().getName() + "\t"+ thisAmount+ "\n";
+  result+="Amount owed is " + totalAmount + "\n";
+  result+="You earned " + frequentRenterPoints + " frequent renter points";
+}
+
+* Target class: Movie
+    Source class LCOM before refactoring: 0.625
+    Target class LCOM before refactoring: 0.95
+    Source class LCOM after refactoring: 0.625
+    Target class LCOM after refactoring: 0.96
+        LCOM reduction (improvement): 0.010000000000000009
+
+* Target class: Registrar
+    Source class LCOM before refactoring: 0.625
+    Target class LCOM before refactoring: 0.625
+    Source class LCOM after refactoring: 0.625
+    Target class LCOM after refactoring: 0.7
+        LCOM reduction (improvement): 0.07499999999999996
+
+* Target class: Rental
+    Source class LCOM before refactoring: 0.625
+    Target class LCOM before refactoring: 0.5
+    Source class LCOM after refactoring: 0.625
+    Target class LCOM after refactoring: 0.6666666666666666
+        LCOM reduction (improvement): 0.16666666666666652
+
+* Target class: Tape
+    Source class LCOM before refactoring: 0.625
+    Target class LCOM before refactoring: 0.5
+    Source class LCOM after refactoring: 0.625
+    Target class LCOM after refactoring: 0.75
+        LCOM reduction (improvement): 0.25
+
+*** Best Target Class: Tape
+```
+
+### ComplexClass
+
+```text
+===== Extracted Method =====
+public String concatenatePath(ArchiveFileSet afs,String name){
+  String pr=afs.getPref(getProj());
+  if (!pr.endsWith("/") && !pr.endsWith("\\")) {
+    pr+="/";
+  }
+  name=pr + name;
+}
+
+* Target class: ArchiveFileSet
+    Source class LCOM before refactoring: 1.0
+    Target class LCOM before refactoring: 0.0
+    Source class LCOM after refactoring: 1.3333333333333333
+    Target class LCOM after refactoring: 0.0
+        LCOM reduction (improvement): 0.33333333333333326
+
+* Target class: FileSet
+    Source class LCOM before refactoring: 1.0
+    Target class LCOM before refactoring: 0.0
+    Source class LCOM after refactoring: 1.3333333333333333
+    Target class LCOM after refactoring: 1.5
+        LCOM reduction (improvement): 1.833333333333333
+
+* Target class: Resource
+    Source class LCOM before refactoring: 1.0
+    Target class LCOM before refactoring: 0.0
+    Source class LCOM after refactoring: 1.3333333333333333
+    Target class LCOM after refactoring: 1.0
+        LCOM reduction (improvement): 1.333333333333333
+
+*** Best Target Class: FileSet
+```
 
 # Step 7: Generate the output json
 

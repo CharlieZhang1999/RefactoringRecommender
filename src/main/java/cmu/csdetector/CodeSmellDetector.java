@@ -135,6 +135,12 @@ public class CodeSmellDetector {
         builder.serializeNulls();
 
         Gson gson = builder.create();
+
+        if (parameters.shouldFilterSmelly()) {
+            // remove entries in smellyTypes that have empty smells on its own and all its methods
+            smellyTypes.removeIf(type -> type.getSmells().isEmpty() && type.getMethods().stream().allMatch(method -> method.getSmells().isEmpty()));
+        }
+
         gson.toJson(smellyTypes, writer);
         writer.close();
     }

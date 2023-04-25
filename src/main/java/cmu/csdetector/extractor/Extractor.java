@@ -2,26 +2,24 @@ package cmu.csdetector.extractor;
 
 import cmu.csdetector.ast.visitors.MethodCollector;
 import cmu.csdetector.predictor.Predictor;
-import org.eclipse.jdt.core.dom.*;
 import cmu.csdetector.resources.Method;
 import cmu.csdetector.resources.Resource;
 import cmu.csdetector.resources.Type;
-//import org.eclipse.jdt.core.dom.Type as ASTType;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
 import cmu.csdetector.resources.loader.SourceFilesLoader;
+import org.eclipse.jdt.core.dom.*;
 
-import javax.sound.midi.SysexMessage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.json.JSONObject;
 
 /**
  * The main pipeline for extracting opportunities for a given target resource.
  */
 public class Extractor {
+    private final boolean DEBUG = true;
     /**
      * The target resource to extract opportunities from
      */
@@ -82,6 +80,14 @@ public class Extractor {
         // Step 1: Accept the visitor to build the statement table
         resource.getNode().accept(statementVisitor);
         SortedMap<Integer, Set<String>> statementsTable = statementVisitor.getLineNumToStatementsTable(cu);
+        if (this.DEBUG) {
+            // pretty print the statement table in ascii table
+            System.out.println("===== Statement Table =====");
+            System.out.println("Line Number | Statements");
+            statementsTable.forEach((lineNum, statements) -> {
+                System.out.println(String.format("%11d | %s", lineNum, statements.stream().collect(Collectors.joining(", "))));
+            });
+        }
 
         // Step 2: Extract the opportunities for each step
         Set<List<Integer>> opportunitySet = new HashSet<>();
@@ -92,6 +98,18 @@ public class Extractor {
                 // add the opportunities whose length is greater than 1 to the map
                 opportunitySet.addAll(opportunities);
             }
+        }
+        if (this.DEBUG) {
+            // pretty print the opportunities in ascii table
+            System.out.println("===== Opportunities =====");
+            System.out.println("Start Line | End Line | Variables");
+            opportunitySet.forEach(opportunity -> {
+                String statements = opportunity.stream()
+                        .map(statementsTable::get)
+                        .map(statementsSet -> statementsSet.stream().collect(Collectors.joining(", ")))
+                        .collect(Collectors.joining(", "));
+                System.out.println(String.format("%10d | %8d | %s", opportunity.get(0), opportunity.get(opportunity.size() - 1), statements));
+            });
         }
 
         // Step 3: Create method declarations for all opportunities
@@ -116,8 +134,14 @@ public class Extractor {
                 .collect(Collectors.toList());
 
         // Step 4: Filter & ranking the opportunities
+        int beforeExtractedMethodCount = extractedMethods.size();
         OpportunityProcessor opportunityProcessor = new OpportunityProcessor(extractedMethods);
         extractedMethods = opportunityProcessor.process(); // processed opportunities
+        int afterExtractedMethodCount = extractedMethods.size();
+        if (this.DEBUG) {
+            System.out.println(String.format("===== Opportunities Filtered ====="));
+            System.out.println(String.format("Before: %d, After: %d", beforeExtractedMethodCount, afterExtractedMethodCount));
+        }
 
         // Step 5: Assign the method name, parameters, and return type to each method declaration
         extractedMethods.forEach(em -> {
@@ -230,18 +254,21 @@ public class Extractor {
         List<Type> candidateClasses = getCandidateClasses();
         for (ExtractedMethod em : extractedMethods) {
             MethodDeclaration extractedMethodDeclaration = em.getExtractedMethodDeclaration();
-            System.out.println("===== Extracted Method =====");
-            System.out.println(extractedMethodDeclaration);
+            if (this.DEBUG) {
+                System.out.println("===== Extracted Method =====");
+                System.out.println(extractedMethodDeclaration);
+            }
             for (Type candidateTargetClass : candidateClasses) {
                 RefactoringEvaluator evaluator = new RefactoringEvaluator(this.getSourceFileDirectory(), this.belongingType.getNodeAsTypeDeclaration(), candidateTargetClass.getNodeAsTypeDeclaration(), extractedMethodDeclaration, em.getRefactoredTypeCU());
                 try {
                     evaluator.evaluate();
                     Double reduction = evaluator.getLCOMReduction(); // the larger, the better
                     if (reduction <= 0) { // negative refactoring
-                        System.out.println("Skip negative refactoring: " + candidateTargetClass.getNodeAsTypeDeclaration().getName().getIdentifier());
                         continue;
                     }
-                    evaluator.printEvaluation();
+                    if (this.DEBUG) {
+                        evaluator.printEvaluation();
+                    }
                     // update results
                     extractionImprovements.putIfAbsent(extractedMethodDeclaration, new HashMap<>());
                     extractionImprovements.get(extractedMethodDeclaration).put(candidateTargetClass, reduction);
