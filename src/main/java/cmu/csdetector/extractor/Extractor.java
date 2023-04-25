@@ -197,7 +197,7 @@ public class Extractor {
 
             org.eclipse.jdt.core.dom.Type returnType = ast.newPrimitiveType(PrimitiveType.VOID);
             if (returns.size() == 1) {
-                returnType = constructTypeFromString(returns.get(0).getIdentifier(), ast);
+                returnType = constructTypeFromString(returns.get(0).resolveTypeBinding().getName(), ast);
             } else if(returns.size() > 1) {
                 System.out.println("You can return one of the following: [");
                 for (SimpleName sn: returns) {
