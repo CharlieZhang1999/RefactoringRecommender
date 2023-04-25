@@ -162,11 +162,23 @@ metrics.
 
 # Step 5: Assign the method name, parameters, and return type to each method declaration
 
-- Location: ???
+- Location: `src/main/java/cmu/csdetector/extractor/Extractor.java`
 - Input: `List<ExtractedMethod> extractedMethods` from Step 4
 - Output: `List<ExtractedMethod> extractedMethods` with the method name, parameters, and return type assigned
 
-> TODO
+For inferring the name from method body, we used an OpenAI model named `text-davinci-003` and prompted the model to respond with a resaonable method name. 
+
+
+For assigning the parameters for the method, we used `MethodVariableCollector` to collect all the variables from the larger method that the extracted portion belongs to.
+After we get this list of variables, we iterated through this list and filtered the variables that were in the extracted method (which were the ones that had the condition `startlinenumber > em.startLineNumber` and `endlinenumber < em.endLineNumber`)
+Then for all these variables in `em`, if they were not declared in `em`, they should be added in the parameters list.
+
+
+For assigning the return list and return type to the extracted method, we came up with the following logic: For each variable in the extracted method, if it was reassigned somehow and was used after the extracted method, then it should be returned.
+Thus, we applied `MethodAssignmentCollector` to collect all the `SimpleName` that was on the left side of the assignment. 
+If this `SimpleName` was used after the extracted method (eg: its `startlinenumber > em.endLineNumber`), we added it to the return variable list. 
+We also applied the helper function `constructTypeFromString()` to obtain the type of the returned variable and set it as the return type of the extracted method. 
+
 
 # Step 6: Finding the Target class for each opportunity
 
