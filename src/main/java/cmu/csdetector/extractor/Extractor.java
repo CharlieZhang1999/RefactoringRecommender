@@ -5,9 +5,11 @@ import org.eclipse.jdt.core.dom.*;
 import cmu.csdetector.resources.Method;
 import cmu.csdetector.resources.Resource;
 import cmu.csdetector.resources.Type;
+//import org.eclipse.jdt.core.dom.Type as ASTType;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
 import cmu.csdetector.resources.loader.SourceFilesLoader;
 
+import javax.sound.midi.SysexMessage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -77,9 +79,6 @@ public class Extractor {
     public void extract() {
         // Step 1: Accept the visitor to build the statement table
         resource.getNode().accept(statementVisitor);
-//        if(resource instanceof Method){
-//            resource.getNode().accept(Met);
-//        }
         SortedMap<Integer, Set<String>> statementsTable = statementVisitor.getLineNumToStatementsTable(cu);
 
         // Step 2: Extract the opportunities for each step
@@ -121,7 +120,7 @@ public class Extractor {
         // Step 5: Assign the method name, parameters, and return type to each method declaration
         // TODO: Implement this step, e.g., using GPT fine-tuning
         extractedMethods.forEach(em -> {
-            MethodDeclaration method;
+            MethodDeclaration method = null;
             if (this.resource instanceof Method) {
                 method = (MethodDeclaration) this.resource.getNode();
             } else {
@@ -129,11 +128,10 @@ public class Extractor {
                 MethodCollector collector = new MethodCollector();
                 this.resource.getNode().accept(collector);
                 List<MethodDeclaration> methods = collector.getNodesCollected();
-                method = null;
                 for (MethodDeclaration md: methods) {
 
-                    int start = cu.getLineNumber(md.getStartPosition()) - 1;
-                    int end = cu.getLineNumber(md.getStartPosition() + md.getLength()) - 1;
+                    int start = cu.getLineNumber(md.getStartPosition());
+                    int end = cu.getLineNumber(md.getStartPosition() + md.getLength());
                     if (em.getLineRange()[0] >= start && em.getLineRange()[1] <= end) {
                         method = md;
                         break;
@@ -150,46 +148,71 @@ public class Extractor {
                 method.accept(methodAssignmentCollector);
                 assignments = methodAssignmentCollector.getNodesCollected();
             }
-            List<String> declared = new ArrayList<>();
-            List<String> used = new ArrayList<>();
-            List<String> usedAfter = new ArrayList<>();
+            List<SimpleName> declared = new ArrayList<>();
+            List<SimpleName> used = new ArrayList<>();
+            List<SimpleName> usedAfter = new ArrayList<>();
             for (SimpleName sn: variables) {
                 if (isBetween(cu, sn, em.getLineRange()[0], em.getLineRange()[1])) {
                     if (sn.isDeclaration()) {
-                        declared.add(sn.getIdentifier());
+                        declared.add(sn);
                     } else {
-                        used.add(sn.getIdentifier());
+                        used.add(sn);
                     }
                 } else if (isAfter(cu, sn, em.getLineRange()[1])) {
-                    usedAfter.add(sn.getIdentifier());
+                    usedAfter.add(sn);
                 }
             }
-            List<String> assigned = new ArrayList<>();
+
+            List<SimpleName> assigned = new ArrayList<>();
             for (SimpleName sn: assignments) {
                 if (isBetween(cu, sn, em.getLineRange()[0], em.getLineRange()[1])) {
-                    assigned.add(sn.getIdentifier());
+                    assigned.add(sn);
                 }
             }
 
-            List<String> params = new ArrayList<>();
-            for (String id: used) {
-                if (((!declared.contains(id)) && (!params.contains(id))) && (em.getExtractedMethodDeclaration().toString().contains(id))){
-                    params.add(id);
+            List<SimpleName> params = new ArrayList<>();
+            for (SimpleName sn: used) {
+                if (((!containsSimpleName(declared, sn)) && (!containsSimpleName(params, sn))) && (em.getExtractedMethodDeclaration().toString().contains(sn.getIdentifier()))){
+                    params.add(sn);
                 }
             }
 
-            List<String> returns = new ArrayList<>();
-            for (String id: assigned) {
-                if ((usedAfter.contains(id) && (!returns.contains(id))) && (em.getExtractedMethodDeclaration().toString().contains(id))){
+            AST ast = em.getExtractedMethodDeclaration().getAST();
+
+            List<SingleVariableDeclaration> paramsWithType = params.stream().map( p -> {
+                ITypeBinding typeBinding = p.resolveTypeBinding();
+                String name = typeBinding.getName();
+                SingleVariableDeclaration vd = ast.newSingleVariableDeclaration();
+                vd.setType(constructTypeFromString(typeBinding.getName(), ast));
+                vd.setName(ast.newSimpleName(p.getIdentifier()));
+                return vd;
+            }).collect(Collectors.toList());
+
+            List<SimpleName> returns = new ArrayList<>();
+            for (SimpleName id: assigned) {
+                if ((containsSimpleName(usedAfter, id) && (!containsSimpleName(returns, id))) && (em.getExtractedMethodDeclaration().toString().contains(id.getIdentifier()))){
                     returns.add(id);
                 }
             }
 
+            org.eclipse.jdt.core.dom.Type returnType = ast.newPrimitiveType(PrimitiveType.VOID);
+            if(returns.size() == 1){
+                returnType = constructTypeFromString(returns.get(0).getIdentifier(), ast);
+            } else {
+                System.out.println("You can return one of the following: [");
+                for (SimpleName sn: returns) {
+                    System.out.print(sn.getIdentifier() + " ");
+                }
+                System.out.print("]");
+            }
+
+
+            SignatureRecommender recommender = new SignatureRecommender(em, this.resource, this.cu);
             String methodBody = em.getExtractedMethodDeclaration().getBody().toString();
-            SignatureRecommender recommender = new SignatureRecommender(em);
             em.setExtractedMethodName("extractedMethod");
-            em.setExtractedMethodParameters(new ArrayList<>());
-            em.setExtractedMethodReturnType(PrimitiveType.VOID);
+            em.setExtractedMethodParameters(paramsWithType);
+
+            em.setExtractedMethodReturnType(returnType);
         });
 
         // Step 6: Finding the Target class for each opportunity
@@ -223,6 +246,40 @@ public class Extractor {
             System.out.println("*** Best Target Class: " + extractionImprovements.get(extractedMethodDeclaration).entrySet().stream().max(Comparator.comparingDouble(Map.Entry::getValue)).get().getKey().getNodeAsTypeDeclaration().getName().getIdentifier());
         }
         // TODO: add results to the output json file
+    }
+
+
+    private org.eclipse.jdt.core.dom.Type constructTypeFromString(String typeString, AST ast){
+        int arrayDimension = 0;
+        while(typeString.endsWith("[]")){
+            arrayDimension++;
+            typeString = typeString.substring(0, typeString.length() - 2);
+        }
+        if (arrayDimension > 0){
+            return ast.newArrayType(constructTypeFromObjectString(typeString, ast), arrayDimension);
+        }
+
+        return constructTypeFromObjectString(typeString, ast);
+    }
+
+
+    private org.eclipse.jdt.core.dom.Type constructTypeFromObjectString(String typeString, AST ast){
+        HashSet<String> set = new HashSet<>(Arrays.asList("byte", "short", "char", "int", "long", "float", "double", "boolean", "void"));
+
+        if(set.contains(typeString)){
+            PrimitiveType type = ast.newPrimitiveType(PrimitiveType.toCode(typeString));
+            return type;
+        }
+
+        return ast.newSimpleType(ast.newName(typeString));
+    }
+
+    private boolean containsSimpleName(List<SimpleName> sns, SimpleName simpleName) {
+        for (SimpleName sn : sns) {
+            if(Objects.equals(sn.getIdentifier(), simpleName.getIdentifier()))
+                return true;
+        }
+        return false;
     }
 
     /**
