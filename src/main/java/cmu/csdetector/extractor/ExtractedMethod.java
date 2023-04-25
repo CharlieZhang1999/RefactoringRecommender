@@ -102,20 +102,46 @@ public class ExtractedMethod {
         int newEndLine = startLine;
         for (; newEndLine <= this.maxLineNum && newEndLine <= endLine; newEndLine++) {
             String statementStr = this.readLineByNumber(newEndLine);
-            Block stmt = cloneBlock(ast, (Block) this.buildStatementFromString(statementStr));
+            ArrayList<Statement> stmtList = new ArrayList<>();
+            Statement newStatement = this.buildStatementFromString(statementStr);
+            if (newStatement instanceof Block) {
+                ArrayList<Statement> blockStatements = new ArrayList<>();
+                List<Statement> l = cloneBlock(ast, ((Block) newStatement)).statements();
+                for (Statement s: l) {
+                    stmtList.add(cloneStatement(ast, s));
+                }
+            } else {
+                stmtList.add(cloneStatement(ast, newStatement));
+            }
+//            Block stmt = cloneBlock(ast, (Block) this.buildStatementFromString(statementStr));
 
             // if the statementStr represents a partial multi-line block (e.g. IfStatement)
             // then we need to read the next line to complete the block
             int i = newEndLine + 1;
-            for (; i < this.maxLineNum && stmt.statements().isEmpty(); i++) {
+            for (; i < this.endLine && stmtList.isEmpty(); i++) {
                 statementStr = statementStr + "\n" + this.readLineByNumber(i);
-                stmt = this.cloneBlock(ast, (Block) this.buildStatementFromString(statementStr));
+                newStatement = this.buildStatementFromString(statementStr);
+                if (newStatement instanceof Block) {
+                    ArrayList<Statement> blockStatements = new ArrayList<>();
+                    List<Statement> l = cloneBlock(ast, ((Block) newStatement)).statements();
+                    for (Statement s: l) {
+                        stmtList.add(cloneStatement(ast, s));
+                    }
+
+//                    stmtList.addAll(cloneBlock(ast, ((Block) newStatement)).statements());
+                } else {
+                    stmtList.add(cloneStatement(ast, newStatement));
+                }
             }
-            newEndLine = i - 1;
 
             // avoid adding empty blocks
-            if (!stmt.statements().isEmpty()) {
-                methodBody.statements().add(stmt);
+            if (!stmtList.isEmpty()) {
+                for (Statement s: stmtList) {
+
+                    methodBody.statements().add(s);
+                }
+//                methodBody.statements().addAll(stmtList);
+                newEndLine = i - 1;
             }
         }
 
@@ -128,7 +154,8 @@ public class ExtractedMethod {
 
             case 1:
                 // if the method body only contains one statement, then directly use the statement as the method body
-                extractedMethodDeclaration.setBody(this.cloneBlock(ast, (Block) methodBody.statements().get(0)));
+//                extractedMethodDeclaration.setBody(this.cloneBlock(ast, (Block) methodBody.statements().get(0)));
+                extractedMethodDeclaration.setBody(methodBody);
                 break;
 
             default:
@@ -245,6 +272,8 @@ public class ExtractedMethod {
         return (Statement) parser.createAST(null);
     }
 
+
+
     /**
      * Clone a block
      *
@@ -253,6 +282,10 @@ public class ExtractedMethod {
      */
     private Block cloneBlock(AST ast, Block block) {
         return (Block) ASTNode.copySubtree(ast, block);
+    }
+
+    private Statement cloneStatement(AST ast, Statement stmt) {
+        return (Statement) ASTNode.copySubtree(ast, stmt);
     }
 
     public MethodDeclaration getExtractedMethodDeclaration() {

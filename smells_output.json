@@ -1,597 +1,200 @@
 [
   {
-    "methods": [
-      {
-        "parametersTypes": [
-          "String"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Customer.java"
-        },
-        "fullyQualifiedName": "Customer.Customer",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 2.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 1.0
-        },
-        "kind": "public method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Customer.java"
-        },
-        "fullyQualifiedName": "Customer.statement",
-        "metricsValues": {
-          "CouplingIntensity": 5.0,
-          "CyclomaticComplexity": 8.0,
-          "NumberOfAccessedVariables": 11.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 3.0,
-          "MaxNesting": 2.0,
-          "MethodLinesOfCode": 30.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 0.6,
-          "ParameterCount": 0.0
-        },
-        "kind": "public method",
-        "smells": [
-          {
-            "name": "FeatureEnvy",
-            "reason": "EXTERNAL_METHOD_CALLS to Movie (3) > INTERNAL_CALLS (0)",
-            "startingLine": 13,
-            "endingLine": 58
-          },
-          {
-            "name": "FeatureEnvy",
-            "reason": "EXTERNAL_METHOD_CALLS to Tape (3) > INTERNAL_CALLS (0)",
-            "startingLine": 13,
-            "endingLine": 58
-          },
-          {
-            "name": "FeatureEnvy",
-            "reason": "EXTERNAL_METHOD_CALLS to Rental (9) > INTERNAL_CALLS (0)",
-            "startingLine": 13,
-            "endingLine": 58
-          }
-        ]
-      },
-      {
-        "parametersTypes": [
-          "Rental"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Customer.java"
-        },
-        "fullyQualifiedName": "Customer.addRental",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 2.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 1.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 1.0
-        },
-        "kind": "public method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [
-          "String"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Customer.java"
-        },
-        "fullyQualifiedName": "Customer.get",
-        "metricsValues": {
-          "CouplingIntensity": 1.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 1.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 1.0,
-          "ParameterCount": 1.0
-        },
-        "kind": "public static method",
-        "smells": [
-          {
-            "name": "FeatureEnvy",
-            "reason": "EXTERNAL_METHOD_CALLS to Registrar (1) > INTERNAL_CALLS (0)",
-            "startingLine": 64,
-            "endingLine": 66
-          }
-        ]
-      },
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Customer.java"
-        },
-        "fullyQualifiedName": "Customer.persist",
-        "metricsValues": {
-          "CouplingIntensity": 1.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 1.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 1.0,
-          "ParameterCount": 0.0
-        },
-        "kind": "public method",
-        "smells": [
-          {
-            "name": "FeatureEnvy",
-            "reason": "EXTERNAL_METHOD_CALLS to Registrar (1) > INTERNAL_CALLS (0)",
-            "startingLine": 68,
-            "endingLine": 70
-          }
-        ]
-      }
-    ],
+    "methods": [],
     "sourceFile": {
-      "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Customer.java"
+      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ArchiveFileSet.java"
     },
-    "fullyQualifiedName": "Customer",
+    "fullyQualifiedName": "paper.example.ArchiveFileSet",
     "metricsValues": {
+      "OverrideRatio": null,
+      "WeighOfClass": 0.0,
       "NumberOfAccessorMethods": 0.0,
-      "LCOM2": 0.5,
       "PublicFieldCount": 0.0,
-      "ClassLinesOfCode": 41.0,
-      "WeightedMethodCount": 12.0,
       "IsAbstract": 0.0,
-      "WeighOfClass": 1.0,
-      "TightClassCohesion": 0.4,
-      "OverrideRatio": null
-    },
-    "kind": "public class",
-    "smells": []
-  },
-  {
-    "methods": [
-      {
-        "parametersTypes": [
-          "String",
-          "int"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Movie.java"
-        },
-        "fullyQualifiedName": "Movie.Movie",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 4.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 3.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 2.0
-        },
-        "kind": "public method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Movie.java"
-        },
-        "fullyQualifiedName": "Movie.priceCode",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 1.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 0.0
-        },
-        "kind": "public method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Movie.java"
-        },
-        "fullyQualifiedName": "Movie.persist",
-        "metricsValues": {
-          "CouplingIntensity": 1.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 1.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 1.0,
-          "ParameterCount": 0.0
-        },
-        "kind": "public method",
-        "smells": [
-          {
-            "name": "FeatureEnvy",
-            "reason": "EXTERNAL_METHOD_CALLS to Registrar (1) > INTERNAL_CALLS (0)",
-            "startingLine": 21,
-            "endingLine": 23
-          }
-        ]
-      },
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Movie.java"
-        },
-        "fullyQualifiedName": "Movie.get",
-        "metricsValues": {
-          "CouplingIntensity": 1.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 1.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 1.0,
-          "ParameterCount": 0.0
-        },
-        "kind": "public method",
-        "smells": [
-          {
-            "name": "FeatureEnvy",
-            "reason": "EXTERNAL_METHOD_CALLS to Registrar (1) > INTERNAL_CALLS (0)",
-            "startingLine": 25,
-            "endingLine": 27
-          }
-        ]
-      },
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Movie.java"
-        },
-        "fullyQualifiedName": "Movie.getName",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 1.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 0.0
-        },
-        "kind": "public method",
-        "smells": []
-      }
-    ],
-    "sourceFile": {
-      "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Movie.java"
-    },
-    "fullyQualifiedName": "Movie",
-    "metricsValues": {
-      "NumberOfAccessorMethods": 2.0,
-      "LCOM2": 0.76,
-      "PublicFieldCount": 0.0,
-      "ClassLinesOfCode": 17.0,
-      "WeightedMethodCount": 5.0,
-      "IsAbstract": 0.0,
-      "WeighOfClass": 0.6,
-      "TightClassCohesion": 0.7,
-      "OverrideRatio": null
-    },
-    "kind": "public class",
-    "smells": []
-  },
-  {
-    "methods": [
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Registrar.java"
-        },
-        "fullyQualifiedName": "Registrar.clean",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 0.0
-        },
-        "kind": "public static method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [
-          "String",
-          "Movie"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Registrar.java"
-        },
-        "fullyQualifiedName": "Registrar.addMovie",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 3.0,
-          "NumberOfAccessedVariables": 3.0,
-          "ChangingClasses": 1.0,
-          "MaxCallChain": 1.0,
-          "MaxNesting": 1.0,
-          "MethodLinesOfCode": 4.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 2.0
-        },
-        "kind": "public static method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [
-          "String"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Registrar.java"
-        },
-        "fullyQualifiedName": "Registrar.getMovie",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 2.0,
-          "ChangingClasses": 1.0,
-          "MaxCallChain": 1.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 1.0
-        },
-        "kind": "public static method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [
-          "String",
-          "Customer"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Registrar.java"
-        },
-        "fullyQualifiedName": "Registrar.addCustomer",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 3.0,
-          "NumberOfAccessedVariables": 3.0,
-          "ChangingClasses": 1.0,
-          "MaxCallChain": 1.0,
-          "MaxNesting": 1.0,
-          "MethodLinesOfCode": 4.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 2.0
-        },
-        "kind": "public static method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [
-          "String"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Registrar.java"
-        },
-        "fullyQualifiedName": "Registrar.getCustomer",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 2.0,
-          "ChangingClasses": 1.0,
-          "MaxCallChain": 1.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 1.0
-        },
-        "kind": "public static method",
-        "smells": []
-      }
-    ],
-    "sourceFile": {
-      "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Registrar.java"
-    },
-    "fullyQualifiedName": "Registrar",
-    "metricsValues": {
-      "NumberOfAccessorMethods": 0.0,
-      "LCOM2": 0.5,
-      "PublicFieldCount": 0.0,
-      "ClassLinesOfCode": 17.0,
-      "WeightedMethodCount": 9.0,
-      "IsAbstract": 0.0,
-      "WeighOfClass": 1.0,
-      "TightClassCohesion": 0.4,
-      "OverrideRatio": null
-    },
-    "kind": "public class",
-    "smells": []
-  },
-  {
-    "methods": [
-      {
-        "parametersTypes": [
-          "Tape",
-          "int"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Rental.java"
-        },
-        "fullyQualifiedName": "Rental.Rental",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 4.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 3.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 2.0
-        },
-        "kind": "public method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Rental.java"
-        },
-        "fullyQualifiedName": "Rental.daysRented",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 1.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 0.0
-        },
-        "kind": "public method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Rental.java"
-        },
-        "fullyQualifiedName": "Rental.getTape",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 1.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 0.0
-        },
-        "kind": "public method",
-        "smells": []
-      }
-    ],
-    "sourceFile": {
-      "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Rental.java"
-    },
-    "fullyQualifiedName": "Rental",
-    "metricsValues": {
-      "NumberOfAccessorMethods": 1.0,
-      "LCOM2": 0.33333333333333337,
-      "PublicFieldCount": 0.0,
-      "ClassLinesOfCode": 10.0,
-      "WeightedMethodCount": 3.0,
-      "IsAbstract": 0.0,
-      "WeighOfClass": 0.6666666666666666,
-      "TightClassCohesion": 0.6666666666666666,
-      "OverrideRatio": null
-    },
-    "kind": "public class",
-    "smells": []
-  },
-  {
-    "methods": [
-      {
-        "parametersTypes": [
-          "String",
-          "Movie"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Tape.java"
-        },
-        "fullyQualifiedName": "Tape.Tape",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 4.0,
-          "ChangingClasses": 0.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 3.0,
-          "ChangingMethods": 0.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 2.0
-        },
-        "kind": "public method",
-        "smells": []
-      },
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Tape.java"
-        },
-        "fullyQualifiedName": "Tape.getMovie",
-        "metricsValues": {
-          "CouplingIntensity": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingClasses": 1.0,
-          "MaxCallChain": 0.0,
-          "MaxNesting": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "ChangingMethods": 1.0,
-          "CouplingDispersion": 0.0,
-          "ParameterCount": 0.0
-        },
-        "kind": "public method",
-        "smells": []
-      }
-    ],
-    "sourceFile": {
-      "fileRelativePath": "examples\\RefactoringExample\\src\\main\\java\\Tape.java"
-    },
-    "fullyQualifiedName": "Tape",
-    "metricsValues": {
-      "NumberOfAccessorMethods": 1.0,
-      "LCOM2": 0.25,
-      "PublicFieldCount": 0.0,
-      "ClassLinesOfCode": 8.0,
-      "WeightedMethodCount": 2.0,
-      "IsAbstract": 0.0,
-      "WeighOfClass": 0.5,
       "TightClassCohesion": 1.0,
-      "OverrideRatio": null
+      "ClassLinesOfCode": 1.0,
+      "WeightedMethodCount": 0.0,
+      "LCOM2": 0.0
+    },
+    "kind": "public class",
+    "smells": []
+  },
+  {
+    "methods": [
+      {
+        "parametersTypes": [
+          "Resource[]"
+        ],
+        "sourceFile": {
+          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+        },
+        "fullyQualifiedName": "paper.example.ComplexClass.gradManifests",
+        "metricsValues": {
+          "MaxCallChain": 3.0,
+          "MethodLinesOfCode": 25.0,
+          "CouplingDispersion": 0.5,
+          "CyclomaticComplexity": 12.0,
+          "NumberOfAccessedVariables": 10.0,
+          "ChangingMethods": 0.0,
+          "CouplingIntensity": 4.0,
+          "ParameterCount": 1.0,
+          "MaxNesting": 6.0,
+          "ChangingClasses": 0.0
+        },
+        "kind": "public method",
+        "smells": []
+      },
+      {
+        "parametersTypes": [
+          "FileSet[]"
+        ],
+        "sourceFile": {
+          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+        },
+        "fullyQualifiedName": "paper.example.ComplexClass.grabRes",
+        "metricsValues": {
+          "MaxCallChain": 0.0,
+          "MethodLinesOfCode": 2.0,
+          "CouplingDispersion": 0.0,
+          "CyclomaticComplexity": 1.0,
+          "NumberOfAccessedVariables": 1.0,
+          "ChangingMethods": 1.0,
+          "CouplingIntensity": 0.0,
+          "ParameterCount": 1.0,
+          "MaxNesting": 0.0,
+          "ChangingClasses": 1.0
+        },
+        "kind": "public method",
+        "smells": []
+      },
+      {
+        "parametersTypes": [
+          "Resource[]"
+        ],
+        "sourceFile": {
+          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+        },
+        "fullyQualifiedName": "paper.example.ComplexClass.grabNonFileSetRes",
+        "metricsValues": {
+          "MaxCallChain": 0.0,
+          "MethodLinesOfCode": 2.0,
+          "CouplingDispersion": 0.0,
+          "CyclomaticComplexity": 1.0,
+          "NumberOfAccessedVariables": 1.0,
+          "ChangingMethods": 1.0,
+          "CouplingIntensity": 0.0,
+          "ParameterCount": 1.0,
+          "MaxNesting": 0.0,
+          "ChangingClasses": 1.0
+        },
+        "kind": "public method",
+        "smells": []
+      },
+      {
+        "parametersTypes": [],
+        "sourceFile": {
+          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+        },
+        "fullyQualifiedName": "paper.example.ComplexClass.getProj",
+        "metricsValues": {
+          "MaxCallChain": 0.0,
+          "MethodLinesOfCode": 2.0,
+          "CouplingDispersion": 0.0,
+          "CyclomaticComplexity": 1.0,
+          "NumberOfAccessedVariables": 0.0,
+          "ChangingMethods": 1.0,
+          "CouplingIntensity": 0.0,
+          "ParameterCount": 0.0,
+          "MaxNesting": 0.0,
+          "ChangingClasses": 1.0
+        },
+        "kind": "public method",
+        "smells": []
+      }
+    ],
+    "sourceFile": {
+      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
+    },
+    "fullyQualifiedName": "paper.example.ComplexClass",
+    "metricsValues": {
+      "OverrideRatio": null,
+      "WeighOfClass": 0.75,
+      "NumberOfAccessorMethods": 1.0,
+      "PublicFieldCount": 0.0,
+      "IsAbstract": 0.0,
+      "TightClassCohesion": 0.0,
+      "ClassLinesOfCode": 33.0,
+      "WeightedMethodCount": 15.0,
+      "LCOM2": 0.75
+    },
+    "kind": "public class",
+    "smells": [
+      {
+        "name": "ComplexClass",
+        "reason": "CC = 12.0",
+        "startingLine": 3,
+        "endingLine": 53
+      }
+    ]
+  },
+  {
+    "methods": [],
+    "sourceFile": {
+      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\FileSet.java"
+    },
+    "fullyQualifiedName": "paper.example.FileSet",
+    "metricsValues": {
+      "OverrideRatio": 0.5,
+      "WeighOfClass": 0.0,
+      "NumberOfAccessorMethods": 0.0,
+      "PublicFieldCount": 0.0,
+      "IsAbstract": 0.0,
+      "TightClassCohesion": 1.0,
+      "ClassLinesOfCode": 1.0,
+      "WeightedMethodCount": 0.0,
+      "LCOM2": 0.0
+    },
+    "kind": "public class",
+    "smells": []
+  },
+  {
+    "methods": [
+      {
+        "parametersTypes": [],
+        "sourceFile": {
+          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\Resource.java"
+        },
+        "fullyQualifiedName": "paper.example.Resource.getName",
+        "metricsValues": {
+          "MaxCallChain": 0.0,
+          "MethodLinesOfCode": 2.0,
+          "CouplingDispersion": 0.0,
+          "CyclomaticComplexity": 1.0,
+          "NumberOfAccessedVariables": 1.0,
+          "ChangingMethods": 1.0,
+          "CouplingIntensity": 0.0,
+          "ParameterCount": 0.0,
+          "MaxNesting": 0.0,
+          "ChangingClasses": 1.0
+        },
+        "kind": "public method",
+        "smells": []
+      }
+    ],
+    "sourceFile": {
+      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\Resource.java"
+    },
+    "fullyQualifiedName": "paper.example.Resource",
+    "metricsValues": {
+      "OverrideRatio": null,
+      "WeighOfClass": 0.0,
+      "NumberOfAccessorMethods": 1.0,
+      "PublicFieldCount": 1.0,
+      "IsAbstract": 0.0,
+      "TightClassCohesion": 1.0,
+      "ClassLinesOfCode": 4.0,
+      "WeightedMethodCount": 1.0,
+      "LCOM2": 0.0
     },
     "kind": "public class",
     "smells": []
