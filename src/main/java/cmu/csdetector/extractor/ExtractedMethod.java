@@ -322,8 +322,8 @@ public class ExtractedMethod {
         this.extractedMethodDeclaration.setName(this.extractedMethodDeclaration.getAST().newSimpleName(methodName));
     }
 
-    public void setExtractedMethodReturnType(PrimitiveType.Code returnType) {
-        this.extractedMethodDeclaration.setReturnType2(this.extractedMethodDeclaration.getAST().newPrimitiveType(returnType));
+    public void setExtractedMethodReturnType(org.eclipse.jdt.core.dom.Type type) {
+        this.extractedMethodDeclaration.setReturnType2(type);
     }
 
     public void setExtractedMethodParameters(List<SingleVariableDeclaration> parameters) {

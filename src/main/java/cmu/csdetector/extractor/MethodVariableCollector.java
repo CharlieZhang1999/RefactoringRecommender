@@ -17,23 +17,7 @@ public class MethodVariableCollector extends CollectorVisitor<SimpleName> {
      * Using these declarations we can determine whether a
      * simple name is a field access or not
      */
-//    private Set<IBinding> fieldBindings;
 
-
-//    private Map<IBinding, FieldDeclaration> bindingsToDeclarations;
-
-//    private void resolveFieldBindings(List<FieldDeclaration> fieldDeclarations) {
-//        this.fieldBindings = new HashSet<>();
-//        this.bindingsToDeclarations = new HashMap<>();
-//        for (FieldDeclaration fieldDeclaration : fieldDeclarations) {
-//            Object obj = fieldDeclaration.fragments().get(0);
-//            if(obj instanceof VariableDeclarationFragment){
-//                IBinding binding = ((VariableDeclarationFragment) obj).getName().resolveBinding();
-//                this.fieldBindings.add(binding);
-//                bindingsToDeclarations.put(binding, fieldDeclaration);
-//            }
-//        }
-//    }
 
     public MethodVariableCollector() {
 

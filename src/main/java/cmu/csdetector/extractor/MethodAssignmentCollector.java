@@ -8,7 +8,6 @@ import org.eclipse.jdt.core.dom.SimpleName;
 public class MethodAssignmentCollector extends CollectorVisitor<SimpleName> {
 
 
-
     public MethodAssignmentCollector() {
 
     }
