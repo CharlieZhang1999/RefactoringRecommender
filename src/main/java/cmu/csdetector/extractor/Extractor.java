@@ -237,7 +237,7 @@ public class Extractor {
             String methodBody = em.getExtractedMethodDeclaration().getBody().toString();
 
             String API_KEY = "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";
-            Predictor predictor = new Predictor("text-davinci-003", 0, API_KEY, 7);
+            Predictor predictor = new Predictor("text-davinci-003", 0, API_KEY, 3000);
 
             String methodName;
             try {
