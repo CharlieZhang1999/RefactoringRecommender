@@ -1,10 +1,5 @@
 [
   {
-<<<<<<< HEAD
-    "methods": [],
-    "sourceFile": {
-      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ArchiveFileSet.java"
-=======
     "methods": [
       {
         "parametersTypes": [
@@ -28,7 +23,8 @@
           "ParameterCount": 2.0
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [],
@@ -49,7 +45,8 @@
           "ParameterCount": 0.0
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       }
     ],
     "sourceFile": {
@@ -68,7 +65,8 @@
       "OverrideRatio": null
     },
     "kind": "public class",
-    "smells": []
+    "smells": [],
+    "extractedMethods": []
   },
   {
     "methods": [
@@ -93,7 +91,8 @@
           "ParameterCount": 1.0
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [],
@@ -133,6 +132,305 @@
             "startingLine": 13,
             "endingLine": 58
           }
+        ],
+        "extractedMethods": [
+          {
+            "startLine": 49,
+            "endLine": 55,
+            "targetClass": "Customer",
+            "beforeRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "afterRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.calculateRental": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "methodName": "calculateRental",
+            "parameters": [
+              "result",
+              "each",
+              "thisAmount",
+              "totalAmount",
+              "frequentRenterPoints"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 53,
+            "endLine": 55,
+            "targetClass": "Customer",
+            "beforeRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "afterRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.calculateTotalAmount": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "methodName": "calculateTotalAmount",
+            "parameters": [
+              "result",
+              "totalAmount",
+              "frequentRenterPoints"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 46,
+            "endLine": 50,
+            "targetClass": "Movie",
+            "beforeRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.95
+            },
+            "afterRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.9428571428571428
+            },
+            "methodName": "calculateFrequent",
+            "parameters": [
+              "each",
+              "NEW_RELEASE",
+              "frequentRenterPoints",
+              "result",
+              "thisAmount"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 49,
+            "endLine": 54,
+            "targetClass": "Movie",
+            "beforeRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.95
+            },
+            "afterRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.95
+            },
+            "methodName": "calculateTotalAmount",
+            "parameters": [
+              "result",
+              "each",
+              "thisAmount",
+              "totalAmount"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 49,
+            "endLine": 55,
+            "targetClass": "Customer",
+            "beforeRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "afterRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.calculateRental": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "methodName": "calculateRental",
+            "parameters": [
+              "result",
+              "each",
+              "thisAmount",
+              "totalAmount",
+              "frequentRenterPoints"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 53,
+            "endLine": 55,
+            "targetClass": "Customer",
+            "beforeRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "afterRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.calculateTotalAmount": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "methodName": "calculateTotalAmount",
+            "parameters": [
+              "result",
+              "totalAmount",
+              "frequentRenterPoints"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 46,
+            "endLine": 50,
+            "targetClass": "Movie",
+            "beforeRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.95
+            },
+            "afterRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.9428571428571428
+            },
+            "methodName": "calculateFrequent",
+            "parameters": [
+              "each",
+              "NEW_RELEASE",
+              "frequentRenterPoints",
+              "result",
+              "thisAmount"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 49,
+            "endLine": 54,
+            "targetClass": "Movie",
+            "beforeRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.95
+            },
+            "afterRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.95
+            },
+            "methodName": "calculateTotalAmount",
+            "parameters": [
+              "result",
+              "each",
+              "thisAmount",
+              "totalAmount"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 49,
+            "endLine": 55,
+            "targetClass": "Customer",
+            "beforeRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "afterRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.calculateRental": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "methodName": "calculateRental",
+            "parameters": [
+              "result",
+              "each",
+              "thisAmount",
+              "totalAmount",
+              "frequentRenterPoints"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 53,
+            "endLine": 55,
+            "targetClass": "Customer",
+            "beforeRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "afterRefactorMetrics": {
+              "Customer.persist": 1.0,
+              "Customer.statement": 8.0,
+              "Customer.get": 1.0,
+              "Customer.Customer": 1.0,
+              "Customer.calculateTotalAmount": 1.0,
+              "Customer.addRental": 1.0
+            },
+            "methodName": "calculateTotalAmount",
+            "parameters": [
+              "result",
+              "totalAmount",
+              "frequentRenterPoints"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 46,
+            "endLine": 50,
+            "targetClass": "Movie",
+            "beforeRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.95
+            },
+            "afterRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.9428571428571428
+            },
+            "methodName": "calculateFrequent",
+            "parameters": [
+              "each",
+              "NEW_RELEASE",
+              "frequentRenterPoints",
+              "result",
+              "thisAmount"
+            ],
+            "returnType": "String"
+          },
+          {
+            "startLine": 49,
+            "endLine": 54,
+            "targetClass": "Movie",
+            "beforeRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.95
+            },
+            "afterRefactorMetrics": {
+              "SourceClassLCOM": 0.625,
+              "TargetClassLCOM": 0.95
+            },
+            "methodName": "calculateTotalAmount",
+            "parameters": [
+              "result",
+              "each",
+              "thisAmount",
+              "totalAmount"
+            ],
+            "returnType": "String"
+          }
         ]
       },
       {
@@ -156,7 +454,8 @@
           "ParameterCount": 1.0
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [
@@ -186,7 +485,8 @@
             "startingLine": 64,
             "endingLine": 66
           }
-        ]
+        ],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [],
@@ -214,60 +514,33 @@
             "startingLine": 68,
             "endingLine": 70
           }
-        ]
+        ],
+        "extractedMethods": []
       }
     ],
     "sourceFile": {
       "fileRelativePath": "examples/RefactoringExample/src/main/java/Customer.java"
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
     },
-    "fullyQualifiedName": "paper.example.ArchiveFileSet",
+    "fullyQualifiedName": "Customer",
     "metricsValues": {
-      "OverrideRatio": null,
-      "WeighOfClass": 0.0,
       "NumberOfAccessorMethods": 0.0,
+      "LCOM2": 0.5,
       "PublicFieldCount": 0.0,
-<<<<<<< HEAD
-      "IsAbstract": 0.0,
-      "TightClassCohesion": 1.0,
-      "ClassLinesOfCode": 1.0,
-      "WeightedMethodCount": 0.0,
-      "LCOM2": 0.0
-=======
       "ClassLinesOfCode": 41.0,
       "WeighOfClass": 1.0,
       "WeightedMethodCount": 12.0,
       "TightClassCohesion": 0.4,
       "IsAbstract": 0.0,
       "OverrideRatio": null
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
     },
     "kind": "public class",
-    "smells": []
+    "smells": [],
+    "extractedMethods": []
   },
   {
     "methods": [
       {
         "parametersTypes": [
-<<<<<<< HEAD
-          "Resource[]"
-        ],
-        "sourceFile": {
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
-        },
-        "fullyQualifiedName": "paper.example.ComplexClass.gradManifests",
-        "metricsValues": {
-          "MaxCallChain": 3.0,
-          "MethodLinesOfCode": 25.0,
-          "CouplingDispersion": 0.5,
-          "CyclomaticComplexity": 12.0,
-          "NumberOfAccessedVariables": 10.0,
-          "ChangingMethods": 0.0,
-          "CouplingIntensity": 4.0,
-          "ParameterCount": 1.0,
-          "MaxNesting": 6.0,
-          "ChangingClasses": 0.0
-=======
           "Tape",
           "int"
         ],
@@ -286,32 +559,14 @@
           "CouplingIntensity": 0.0,
           "CouplingDispersion": 0.0,
           "ParameterCount": 2.0
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
-        "parametersTypes": [
-          "FileSet[]"
-        ],
+        "parametersTypes": [],
         "sourceFile": {
-<<<<<<< HEAD
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
-        },
-        "fullyQualifiedName": "paper.example.ComplexClass.grabRes",
-        "metricsValues": {
-          "MaxCallChain": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "CouplingDispersion": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingMethods": 1.0,
-          "CouplingIntensity": 0.0,
-          "ParameterCount": 1.0,
-          "MaxNesting": 0.0,
-          "ChangingClasses": 1.0
-=======
           "fileRelativePath": "examples/RefactoringExample/src/main/java/Rental.java"
         },
         "fullyQualifiedName": "Rental.daysRented",
@@ -328,7 +583,8 @@
           "ParameterCount": 0.0
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [],
@@ -349,7 +605,8 @@
           "ParameterCount": 0.0
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       }
     ],
     "sourceFile": {
@@ -368,7 +625,8 @@
       "OverrideRatio": null
     },
     "kind": "public class",
-    "smells": []
+    "smells": [],
+    "extractedMethods": []
   },
   {
     "methods": [
@@ -394,7 +652,8 @@
           "ParameterCount": 2.0
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [],
@@ -415,7 +674,8 @@
           "ParameterCount": 0.0
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [],
@@ -434,36 +694,25 @@
           "CouplingIntensity": 1.0,
           "CouplingDispersion": 1.0,
           "ParameterCount": 0.0
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
         },
         "kind": "public method",
-        "smells": []
+        "smells": [
+          {
+            "name": "FeatureEnvy",
+            "reason": "EXTERNAL_METHOD_CALLS to Registrar (1) > INTERNAL_CALLS (0)",
+            "startingLine": 21,
+            "endingLine": 23
+          }
+        ],
+        "extractedMethods": []
       },
       {
-        "parametersTypes": [
-          "Resource[]"
-        ],
+        "parametersTypes": [],
         "sourceFile": {
-<<<<<<< HEAD
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
-=======
           "fileRelativePath": "examples/RefactoringExample/src/main/java/Movie.java"
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
         },
-        "fullyQualifiedName": "paper.example.ComplexClass.grabNonFileSetRes",
+        "fullyQualifiedName": "Movie.get",
         "metricsValues": {
-<<<<<<< HEAD
-          "MaxCallChain": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "CouplingDispersion": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingMethods": 1.0,
-          "CouplingIntensity": 0.0,
-          "ParameterCount": 1.0,
-          "MaxNesting": 0.0,
-          "ChangingClasses": 1.0
-=======
           "NumberOfAccessedVariables": 1.0,
           "MaxNesting": 0.0,
           "MethodLinesOfCode": 2.0,
@@ -474,26 +723,25 @@
           "CouplingIntensity": 1.0,
           "CouplingDispersion": 1.0,
           "ParameterCount": 0.0
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
         },
         "kind": "public method",
-        "smells": []
+        "smells": [
+          {
+            "name": "FeatureEnvy",
+            "reason": "EXTERNAL_METHOD_CALLS to Registrar (1) > INTERNAL_CALLS (0)",
+            "startingLine": 25,
+            "endingLine": 27
+          }
+        ],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [],
         "sourceFile": {
-<<<<<<< HEAD
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
-=======
           "fileRelativePath": "examples/RefactoringExample/src/main/java/Movie.java"
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
         },
-        "fullyQualifiedName": "paper.example.ComplexClass.getProj",
+        "fullyQualifiedName": "Movie.getName",
         "metricsValues": {
-<<<<<<< HEAD
-          "MaxCallChain": 0.0,
-          "MethodLinesOfCode": 2.0,
-=======
           "NumberOfAccessedVariables": 1.0,
           "MaxNesting": 0.0,
           "MethodLinesOfCode": 2.0,
@@ -502,57 +750,36 @@
           "ChangingMethods": 1.0,
           "CyclomaticComplexity": 1.0,
           "CouplingIntensity": 0.0,
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
           "CouplingDispersion": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 0.0,
-          "ChangingMethods": 1.0,
-          "CouplingIntensity": 0.0,
-          "ParameterCount": 0.0,
-          "MaxNesting": 0.0,
-          "ChangingClasses": 1.0
+          "ParameterCount": 0.0
         },
         "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       }
     ],
     "sourceFile": {
-<<<<<<< HEAD
-      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\ComplexClass.java"
-=======
       "fileRelativePath": "examples/RefactoringExample/src/main/java/Movie.java"
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
     },
-    "fullyQualifiedName": "paper.example.ComplexClass",
+    "fullyQualifiedName": "Movie",
     "metricsValues": {
-      "OverrideRatio": null,
-      "WeighOfClass": 0.75,
-      "NumberOfAccessorMethods": 1.0,
+      "NumberOfAccessorMethods": 2.0,
+      "LCOM2": 0.76,
       "PublicFieldCount": 0.0,
-<<<<<<< HEAD
-      "IsAbstract": 0.0,
-      "TightClassCohesion": 0.0,
-      "ClassLinesOfCode": 33.0,
-      "WeightedMethodCount": 15.0,
-      "LCOM2": 0.75
-=======
       "ClassLinesOfCode": 17.0,
       "WeighOfClass": 0.6,
       "WeightedMethodCount": 5.0,
       "TightClassCohesion": 0.7,
       "IsAbstract": 0.0,
       "OverrideRatio": null
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
     },
     "kind": "public class",
-    "smells": [
+    "smells": [],
+    "extractedMethods": []
+  },
+  {
+    "methods": [
       {
-<<<<<<< HEAD
-        "name": "ComplexClass",
-        "reason": "CC = 12.0",
-        "startingLine": 3,
-        "endingLine": 53
-=======
         "parametersTypes": [],
         "sourceFile": {
           "fileRelativePath": "examples/RefactoringExample/src/main/java/Registrar.java"
@@ -571,7 +798,8 @@
           "ParameterCount": 0.0
         },
         "kind": "public static method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [
@@ -595,7 +823,8 @@
           "ParameterCount": 2.0
         },
         "kind": "public static method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [
@@ -618,7 +847,8 @@
           "ParameterCount": 1.0
         },
         "kind": "public static method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [
@@ -642,7 +872,8 @@
           "ParameterCount": 2.0
         },
         "kind": "public static method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       },
       {
         "parametersTypes": [
@@ -665,84 +896,27 @@
           "ParameterCount": 1.0
         },
         "kind": "public static method",
-        "smells": []
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
-      }
-    ]
-  },
-  {
-    "methods": [],
-    "sourceFile": {
-<<<<<<< HEAD
-      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\FileSet.java"
-=======
-      "fileRelativePath": "examples/RefactoringExample/src/main/java/Registrar.java"
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
-    },
-    "fullyQualifiedName": "paper.example.FileSet",
-    "metricsValues": {
-      "OverrideRatio": 0.5,
-      "WeighOfClass": 0.0,
-      "NumberOfAccessorMethods": 0.0,
-      "PublicFieldCount": 0.0,
-<<<<<<< HEAD
-      "IsAbstract": 0.0,
-      "TightClassCohesion": 1.0,
-      "ClassLinesOfCode": 1.0,
-      "WeightedMethodCount": 0.0,
-      "LCOM2": 0.0
-    },
-    "kind": "public class",
-    "smells": []
-  },
-  {
-    "methods": [
-      {
-        "parametersTypes": [],
-        "sourceFile": {
-          "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\Resource.java"
-        },
-        "fullyQualifiedName": "paper.example.Resource.getName",
-        "metricsValues": {
-          "MaxCallChain": 0.0,
-          "MethodLinesOfCode": 2.0,
-          "CouplingDispersion": 0.0,
-          "CyclomaticComplexity": 1.0,
-          "NumberOfAccessedVariables": 1.0,
-          "ChangingMethods": 1.0,
-          "CouplingIntensity": 0.0,
-          "ParameterCount": 0.0,
-          "MaxNesting": 0.0,
-          "ChangingClasses": 1.0
-        },
-        "kind": "public method",
-        "smells": []
+        "smells": [],
+        "extractedMethods": []
       }
     ],
     "sourceFile": {
-      "fileRelativePath": "examples\\ComplexClass\\src\\main\\java\\paper\\example\\Resource.java"
+      "fileRelativePath": "examples/RefactoringExample/src/main/java/Registrar.java"
     },
-    "fullyQualifiedName": "paper.example.Resource",
+    "fullyQualifiedName": "Registrar",
     "metricsValues": {
-      "OverrideRatio": null,
-      "WeighOfClass": 0.0,
-      "NumberOfAccessorMethods": 1.0,
-      "PublicFieldCount": 1.0,
-      "IsAbstract": 0.0,
-      "TightClassCohesion": 1.0,
-      "ClassLinesOfCode": 4.0,
-      "WeightedMethodCount": 1.0,
-      "LCOM2": 0.0
-=======
+      "NumberOfAccessorMethods": 0.0,
+      "LCOM2": 0.5,
+      "PublicFieldCount": 0.0,
       "ClassLinesOfCode": 17.0,
       "WeighOfClass": 1.0,
       "WeightedMethodCount": 9.0,
       "TightClassCohesion": 0.4,
       "IsAbstract": 0.0,
       "OverrideRatio": null
->>>>>>> 83fb206d69f9b7c0b4b983c47b52db80e7508652
     },
     "kind": "public class",
-    "smells": []
+    "smells": [],
+    "extractedMethods": []
   }
 ]

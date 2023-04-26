@@ -1,6 +1,8 @@
 package cmu.csdetector.extractor;
 
 import cmu.csdetector.ast.visitors.MethodCollector;
+import cmu.csdetector.extractor.evaluator.RefactoringCCEvaluator;
+import cmu.csdetector.extractor.evaluator.RefactoringLCOMEvaluator;
 import cmu.csdetector.predictor.Predictor;
 import cmu.csdetector.resources.Method;
 import cmu.csdetector.resources.Resource;
@@ -145,6 +147,7 @@ public class Extractor {
 
         // Step 5: Assign the method name, parameters, and return type to each method declaration
         extractedMethods.forEach(em -> {
+
             MethodDeclaration method = null;
             if (this.resource instanceof Method) {
                 method = (MethodDeclaration) this.resource.getNode();
@@ -251,38 +254,91 @@ public class Extractor {
 
         // Step 6: Finding the Target class for each opportunity
         Map<MethodDeclaration, Map<Type, Double>> extractionImprovements = new HashMap<>(); // <extracted method declaration, <target class, improvement>>
-        List<Type> candidateClasses = getCandidateClasses();
-        for (ExtractedMethod em : extractedMethods) {
-            MethodDeclaration extractedMethodDeclaration = em.getExtractedMethodDeclaration();
-            if (this.DEBUG) {
-                System.out.println("===== Extracted Method =====");
-                System.out.println(extractedMethodDeclaration);
-            }
-            for (Type candidateTargetClass : candidateClasses) {
-                RefactoringEvaluator evaluator = new RefactoringEvaluator(this.getSourceFileDirectory(), this.belongingType.getNodeAsTypeDeclaration(), candidateTargetClass.getNodeAsTypeDeclaration(), extractedMethodDeclaration, em.getRefactoredTypeCU());
-                try {
-                    evaluator.evaluate();
-                    Double reduction = evaluator.getLCOMReduction(); // the larger, the better
-                    if (reduction <= 0) { // negative refactoring
-                        continue;
+
+        List<Type> candidateClasses = null;
+
+        // Feature Envy
+        if(this.resource instanceof Method){
+            candidateClasses = getCandidateClasses();
+            for (ExtractedMethod em : extractedMethods) {
+                MethodDeclaration extractedMethodDeclaration = em.getExtractedMethodDeclaration();
+                if (this.DEBUG) {
+                    System.out.println("===== Extracted Method =====");
+                    System.out.println(extractedMethodDeclaration);
+                }
+                for (Type candidateTargetClass : candidateClasses) {
+                    RefactoringLCOMEvaluator evaluator = new RefactoringLCOMEvaluator(this.getSourceFileDirectory(), this.belongingType.getNodeAsTypeDeclaration(), candidateTargetClass.getNodeAsTypeDeclaration(), extractedMethodDeclaration, em.getRefactoredTypeCU());
+
+                    try {
+                        evaluator.evaluate();
+                        Double reduction = evaluator.getReduction(); // the larger, the better
+                        if (reduction > 0) { // negative refactoring
+                            System.out.println("Skip negative refactoring: " + candidateTargetClass.getNodeAsTypeDeclaration().getName().getIdentifier());
+                            continue;
+                        }
+                        if (this.DEBUG) {
+                            evaluator.printEvaluation();
+                        }
+                        em.setBeforeRefactorMetrics(evaluator.getBeforeRefactorMetrics());
+                        em.setAfterRefactorMetrics(evaluator.getAfterRefactorMetrics());
+                        // update results
+                        extractionImprovements.putIfAbsent(extractedMethodDeclaration, new HashMap<>());
+                        extractionImprovements.get(extractedMethodDeclaration).put(candidateTargetClass, reduction);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                }
+                if (extractionImprovements.get(extractedMethodDeclaration) == null || extractionImprovements.get(extractedMethodDeclaration).isEmpty()) {
+                    System.out.println("No positive refactoring found for this extracted method. Try extracting method in the local class");
+                    RefactoringCCEvaluator evaluator = new RefactoringCCEvaluator(this.getSourceFileDirectory(), this.belongingType.getNodeAsTypeDeclaration(),  em);
+                    try{
+                        evaluator.evaluate();
+                        String targetClass = this.belongingType.getNodeAsTypeDeclaration().getName().getIdentifier();
+                        em.setTargetClass(targetClass);
+                        if (this.DEBUG) {
+                            evaluator.printEvaluation();
+                        }
+                        em.setBeforeRefactorMetrics(evaluator.getBeforeRefactorMetrics());
+                        em.setAfterRefactorMetrics(evaluator.getAfterRefactorMetrics());
+                    }
+                    catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    String targetClass = extractionImprovements.get(extractedMethodDeclaration).entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue)).get().getKey().getNodeAsTypeDeclaration().getName().getIdentifier();
+                    em.setTargetClass(targetClass);
+                    System.out.println("*** Best Target Class: " + targetClass);
+                }
+                this.resource.addExtractedMethod(em);
+            }
+        }
+
+        // ComplexClass
+        else{
+            for (ExtractedMethod em : extractedMethods) {
+                MethodDeclaration extractedMethodDeclaration = em.getExtractedMethodDeclaration();
+                if (this.DEBUG) {
+                    System.out.println("===== Extracted Method =====");
+                    System.out.println(extractedMethodDeclaration);
+                }
+                RefactoringCCEvaluator evaluator = new RefactoringCCEvaluator(this.getSourceFileDirectory(), this.belongingType.getNodeAsTypeDeclaration(), em);
+                try{
+                    evaluator.evaluate();
+                    String targetClass = this.belongingType.getNodeAsTypeDeclaration().getName().getIdentifier();
+                    em.setTargetClass(targetClass);
                     if (this.DEBUG) {
                         evaluator.printEvaluation();
                     }
-                    // update results
-                    extractionImprovements.putIfAbsent(extractedMethodDeclaration, new HashMap<>());
-                    extractionImprovements.get(extractedMethodDeclaration).put(candidateTargetClass, reduction);
-                } catch (IOException e) {
+                    em.setBeforeRefactorMetrics(evaluator.getBeforeRefactorMetrics());
+                    em.setAfterRefactorMetrics(evaluator.getAfterRefactorMetrics());
+                }
+                catch (IOException e){
                     e.printStackTrace();
                 }
+                this.resource.addExtractedMethod(em);
             }
-            if (extractionImprovements.get(extractedMethodDeclaration) == null || extractionImprovements.get(extractedMethodDeclaration).isEmpty()) {
-                System.out.println("No positive refactoring found for this extracted method.");
-                continue;
-            }
-            System.out.println("*** Best Target Class: " + extractionImprovements.get(extractedMethodDeclaration).entrySet().stream().max(Comparator.comparingDouble(Map.Entry::getValue)).get().getKey().getNodeAsTypeDeclaration().getName().getIdentifier());
         }
-        // TODO: add results to the output json file
     }
 
 

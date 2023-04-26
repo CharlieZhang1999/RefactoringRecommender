@@ -41,3 +41,5 @@ lib/
 hs_err_pid*
 
 smells_output.json
+
+*.DS_Store

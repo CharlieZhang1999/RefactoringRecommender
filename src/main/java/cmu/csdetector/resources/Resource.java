@@ -1,5 +1,6 @@
 package cmu.csdetector.resources;
 
+import cmu.csdetector.extractor.ExtractedMethod;
 import cmu.csdetector.metrics.MetricName;
 import cmu.csdetector.resources.loader.SourceFile;
 import cmu.csdetector.smells.Smell;
@@ -23,11 +24,14 @@ public abstract class Resource extends Observable {
 
     private List<Smell> smells;
 
+    private List<ExtractedMethod> extractedMethods;
+
     public Resource(SourceFile sourceFile, ASTNode node) {
         this.metricsValues = new HashMap<>();
         this.sourceFile = sourceFile;
         this.node = node;
-        smells = new ArrayList<>();
+        this.smells = new ArrayList<>();
+        this.extractedMethods = new ArrayList<>();
 
         identifyKind();
     }
@@ -103,4 +107,11 @@ public abstract class Resource extends Observable {
         return smells;
     }
 
+    public void addExtractedMethod(ExtractedMethod em) {
+        this.extractedMethods.add(em);
+    }
+
+    public List<ExtractedMethod> getExtractedMethods() {
+        return extractedMethods;
+    }
 }

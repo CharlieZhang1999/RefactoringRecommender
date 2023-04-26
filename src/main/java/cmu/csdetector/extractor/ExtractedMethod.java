@@ -1,6 +1,5 @@
 package cmu.csdetector.extractor;
 
-import cmu.csdetector.metrics.calculators.type.BaseLCOM;
 import cmu.csdetector.metrics.calculators.type.LCOM3Calculator;
 import cmu.csdetector.resources.Type;
 import cmu.csdetector.resources.loader.JavaFilesFinder;
@@ -8,27 +7,27 @@ import cmu.csdetector.resources.loader.SourceFile;
 import cmu.csdetector.resources.loader.SourceFilesLoader;
 import org.eclipse.jdt.core.dom.*;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import java.util.Map;
 
 public class ExtractedMethod {
-    private final File sourceFile;
+    private final transient File sourceFile;
     /**
      * The Path of the source code file
      */
-    private final String sourceFilePath;
+    private final transient String sourceFilePath;
     /**
      * The maximum line number of the source file
      */
-    private final int maxLineNum;
+    private final transient int maxLineNum;
     private final int startLine;
+
     /**
      * The end line number of the opportunity.
      * It is possible to get updated when the opportunity represents a partial block.
@@ -38,19 +37,30 @@ public class ExtractedMethod {
     /**
      * Extracted method declaration (opportunity)
      */
-    private MethodDeclaration extractedMethodDeclaration;
+    private transient MethodDeclaration extractedMethodDeclaration;
     /**
      * The class declaration after refactoring (opportunity extracted)
      */
-    private TypeDeclaration refactoredTypeDeclaration;
+    private transient TypeDeclaration refactoredTypeDeclaration;
 
     /**
      * The compilation unit of the refactoredTypeDeclaration
      */
-    private CompilationUnit refactoredTypeCU;
-    private double originalLCOM = 0;
-    private double opportunityLCOM = 0;
-    private double refactoredLCOM = 0;
+    private transient CompilationUnit refactoredTypeCU;
+    private transient double originalLCOM = 0;
+    private transient double opportunityLCOM = 0;
+    private transient double refactoredLCOM = 0;
+
+    private String targetClass = "";
+    private Map<String, Double> beforeRefactorMetrics;
+    private Map<String, Double> afterRefactorMetrics;
+
+    private String methodName = "extractedMethod";
+
+    private List<String> parameters;
+
+    private String returnType;
+
 
     public ExtractedMethod(File sourceFile, int startLine, int endLine) throws IOException {
         this.sourceFile = sourceFile;
@@ -58,6 +68,7 @@ public class ExtractedMethod {
         this.maxLineNum = Files.lines(Paths.get(sourceFilePath)).toArray().length;
         this.startLine = startLine;
         this.endLine = endLine;
+        this.parameters = new ArrayList<>();
     }
 
     /**
@@ -243,11 +254,11 @@ public class ExtractedMethod {
 
         // we got a valid extraction
         this.refactoredTypeDeclaration = (TypeDeclaration) this.refactoredTypeCU.types().get(0);
-        String newClassName = refactoredTypeDeclaration.getName().getIdentifier() + "Refactored";
+        String newClassName = refactoredTypeDeclaration.getName().getIdentifier();
         this.refactoredTypeDeclaration.setName(this.refactoredTypeCU.getAST().newSimpleName(newClassName));
 
         // save refactoredTypeDeclaration to a new file
-        this.saveJavaFile(newClassName + ".java", this.refactoredTypeCU.toString());
+        this.saveJavaFile(newClassName + "Refactored.java", this.refactoredTypeCU.toString());
     }
 
     private CompilationUnit getCuFromLines(List<String> lines) {
@@ -319,14 +330,17 @@ public class ExtractedMethod {
     }
 
     public void setExtractedMethodName(String methodName) {
+        this.methodName = methodName;
         this.extractedMethodDeclaration.setName(this.extractedMethodDeclaration.getAST().newSimpleName(methodName));
     }
 
     public void setExtractedMethodReturnType(org.eclipse.jdt.core.dom.Type type) {
+        this.returnType = type.toString();
         this.extractedMethodDeclaration.setReturnType2(type);
     }
 
     public void setExtractedMethodParameters(List<SingleVariableDeclaration> parameters) {
+        this.parameters = parameters.stream().map(param -> param.getName().getIdentifier()).collect(Collectors.toList());
         this.extractedMethodDeclaration.parameters().addAll(parameters);
     }
 
@@ -410,6 +424,30 @@ public class ExtractedMethod {
         // delete the refactored type declaration file
         this.deleteJavaFile(refactoredClassName + ".java");
         this.deleteJavaFile(opportunityClassName + ".java");
+    }
+
+    public String getTargetClass() {
+        return targetClass;
+    }
+
+    public void setTargetClass(String targetClass) {
+        this.targetClass = targetClass;
+    }
+
+    public Map<String, Double> getBeforeRefactorMetrics() {
+        return beforeRefactorMetrics;
+    }
+
+    public void setBeforeRefactorMetrics(Map<String, Double> beforeRefactorMetrics) {
+        this.beforeRefactorMetrics = beforeRefactorMetrics;
+    }
+
+    public Map<String, Double> getAfterRefactorMetrics() {
+        return afterRefactorMetrics;
+    }
+
+    public void setAfterRefactorMetrics(Map<String, Double> afterRefactorMetrics) {
+        this.afterRefactorMetrics = afterRefactorMetrics;
     }
 
 }
