@@ -103,7 +103,10 @@ public class Predictor {
         String prompt = this.buildPrompt(methodBodyJson);
         try {
             String responseText = this.getCompletion(prompt);
-            return responseText.replaceAll("[\\p{Punct}]", " ").replace("\n", " ").trim();
+            return responseText.replaceAll("[\\p{Punct}]", " ")
+                    .replace("\n", " ").trim()
+                    .replaceAll("\\s+","")
+                    .replace("Answer", "");
         } catch (IOException e) {
             throw e;
         }

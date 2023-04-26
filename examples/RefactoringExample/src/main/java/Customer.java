@@ -50,7 +50,7 @@ public class Customer {
 
         }
         //add footer lines
-        result +=  "Amount owed is " + totalAmount + "\n";
+        result += "Amount owed is " + totalAmount + "\n";
         result += "You earned " + frequentRenterPoints + " frequent renter points";
 
         return result;

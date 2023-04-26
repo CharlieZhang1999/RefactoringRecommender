@@ -182,32 +182,31 @@ In this step, we continue to implement the paper's algorithm to extract the oppo
   sorted list of line numbers
 
 StepIterator is an `Iterator` class that is used to extract the opportunities with a given step size.
-In our implementation, for step from 1 to `statementsTable.size()`, we iterate through the statement table to find all
+In our implementation, for step from 1 to the size of the method that the opportunity is from, we iterate through the statement table to find all
 opportunities with the given step size by applying the `StepIterator` class. Each opportunity is a list of line numbers
 and should have the length greater than 1.
 
-Essentially, the `StepIterator` class is a sliding window with size `step` that iterates through the statement table.
-
-- The `next()` method extracts opportunities based on the given step size and the start index by applying a sliding
-  window approach. In the window, we check if the lines shares any common variables or method calls. If so, we put the
-  line numbers into the opportunity set. Otherwise, we move the window to the next line (if `hasNext()`) and repeat the
-  process.
-- The `hasNext()` method returns true if the start index is still within the statement table length.
-- The `haveOverlap()` method checks if lines within the window share any common variables or method calls.
+Bascially, we constructed a matrix. matrix[variable_idx][statement_number] = 1 when the variable appears in the statement.
+Then, we followed the steps provided by the paper. From that matrix, we constructed and merged interval for each step. After that, we removed the duplicates.
+From there on, we got the list of opportunities, which were shown below. 
 
 ### RefactoringExample
 
 ```text
-===== Statement Table =====
+===== Opportunities =====
 Start Line | End Line | Variables
-        49 |       54 | result, getName, each.getTape, getMovie, getTape, each, result, totalAmount, result, frequentRenterPoints
         27 |       28 | daysRented, each, each.daysRented, daysRented, thisAmount, each, each.daysRented
         35 |       36 | daysRented, each, each.daysRented, daysRented, thisAmount, each, each.daysRented
         53 |       54 | result, totalAmount, result, frequentRenterPoints
-        21 |       24 | next, rentals.next, rentals, each, priceCode, each.getTape, getMovie, getTape, each
+        19 |       21 | hasNext, rentals, rentals.hasNext, next, rentals.next, rentals, each
+        26 |       28 | thisAmount, daysRented, thisAmount, each, each.daysRented
+        34 |       36 | thisAmount, daysRented, thisAmount, each, each.daysRented
         46 |       49 | NEW_RELEASE, Movie, priceCode, daysRented, each.getTape, getMovie, Movie.NEW_RELEASE, getTape, each, each.daysRented, result, getName, each.getTape, getMovie, getTape, each
-        36 |       40 | daysRented, thisAmount, each, each.daysRented, totalAmount, thisAmount
+        16 |       36 | this.rentals, iterator, this, rentals, daysRented, thisAmount, each, each.daysRented
         49 |       53 | result, getName, each.getTape, getMovie, getTape, each, result, totalAmount
+        20 |       40 | thisAmount, totalAmount, thisAmount
+        16 |       40 | this.rentals, iterator, this, rentals, totalAmount, thisAmount
+        20 |       46 | thisAmount, NEW_RELEASE, Movie, priceCode, daysRented, each.getTape, getMovie, Movie.NEW_RELEASE, getTape, each, each.daysRented
 ```
 
 ### ComplexClass
@@ -215,37 +214,18 @@ Start Line | End Line | Variables
 ```text
 ===== Opportunities =====
 Start Line | End Line | Variables
-        10 |       11 | rcs, i, rec, rcs, i, grabRes
-        12 |       13 | rcs, i, rec, rcs, i, grabNonFileSetRes
-        20 |       21 | getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs
-        22 |       23 | getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs, pr, getProj, afs.getPref, getPref, afs
-        24 |       25 | pr, endsWith, pr.endsWith, pr
-         6 |        8 | rcs, length, manifests, rcs.length, rcs, length, i, rcs.length
-        10 |       12 | rcs, i, rec, rcs, i, grabRes, rcs, i
-        13 |       16 | rec, rcs, i, grabNonFileSetRes, rec.length, rec, length, j, rec, getName, name, replace, j
-        10 |       13 | rcs, i, rec, rcs, i, grabRes, rcs, i, rec, rcs, i, grabNonFileSetRes
-        20 |       22 | getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs
-        19 |       22 | rcs, i, afs, getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs
-        20 |       23 | getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs, pr, getProj, afs.getPref, getPref, afs
-        24 |       27 | pr, endsWith, pr.endsWith, pr, pr, name
-        23 |       27 | pr, getProj, afs.getPref, getPref, afs, pr, endsWith, pr.endsWith, pr, pr, name
-        31 |       36 | rec, manifests, i, j, manifests, i, manifests, i
-        11 |       12 | rec, rcs, i, grabRes, rcs, i
+         6 |       21 | rcs, length, manifests, rcs.length, getFullPath, getProj, name, afs.getFullPath, afs
         15 |       16 | rec.length, rec, length, j, rec, getName, name, replace, j
-        19 |       20 | rcs, i, afs, getFullPath, getProj, equals, afs.getFullPath, afs
-        21 |       22 | getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs
-        23 |       24 | pr, getProj, afs.getPref, getPref, afs, pr, endsWith, pr.endsWith
         35 |       36 | manifests, i, manifests, i
-        13 |       15 | rec, rcs, i, grabNonFileSetRes, rec.length, rec, length, j
-        17 |       19 | rcs, i, rcs, i, afs
-        25 |       27 | pr, pr, name
-        27 |       30 | pr, name, name, equalsIgnoreCase, MANIFEST_NAME, name.equalsIgnoreCase
-        31 |       35 | rec, manifests, i, j, manifests, i
-        11 |       13 | rec, rcs, i, grabRes, rcs, i, rec, rcs, i, grabNonFileSetRes
-        19 |       21 | rcs, i, afs, getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs
-        21 |       23 | getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs, pr, getProj, afs.getPref, getPref, afs
-        23 |       25 | pr, getProj, afs.getPref, getPref, afs, pr, endsWith, pr.endsWith, pr
-        19 |       23 | rcs, i, afs, getFullPath, getProj, equals, afs.getFullPath, afs, getFullPath, getProj, name, afs.getFullPath, afs, getFullPath, getProj, equals, afs.getPref, getPref, afs.getFullPath, afs, pr, getProj, afs.getPref, getPref, afs
+        10 |       13 | rcs, i, rec, rcs, i, grabNonFileSetRes
+         6 |       27 | rcs, length, manifests, rcs.length, pr, name
+        31 |       36 | rec, manifests, i, j, manifests, i
+        19 |       25 | rcs, i, afs, pr
+         6 |       30 | rcs, length, manifests, rcs.length, name, equalsIgnoreCase, MANIFEST_NAME, name.equalsIgnoreCase
+         6 |       16 | rcs, length, manifests, rcs.length, rec, getName, name, replace, j
+        17 |       27 | rcs, i, pr, name
+        19 |       30 | rcs, i, afs, name, equalsIgnoreCase, MANIFEST_NAME, name.equalsIgnoreCase
+         6 |       19 | rcs, length, manifests, rcs.length, rcs, i, afs
 ```
 
 # Step 3: Create method declarations for all opportunities
@@ -374,77 +354,74 @@ For each extracted method, we find the candidate class with the largest benefit 
 
 ```text
 ===== Extracted Method =====
-public String calculateRental(String result,Rental each,double thisAmount,double totalAmount,int frequentRenterPoints){
-  result+="\t" + each.getTape().getMovie().getName() + "\t"+ thisAmount+ "\n";
-  result+="Amount owed is " + totalAmount + "\n";
-  result+="You earned " + frequentRenterPoints + " frequent renter points";
+public void calculate(Iterator<Rental> rentals,double totalAmount,int frequentRenterPoints){
+  double thisAmount=0;
+  Rental each=rentals.next();
+switch (each.getTape().getMovie().priceCode()) {
+case Movie.REGULAR:
+    thisAmount+=2;
+  if (each.daysRented() > 2)   thisAmount+=(each.daysRented() - 2) * 1.5;
+break;
+case Movie.NEW_RELEASE:
+thisAmount+=each.daysRented() * 3;
+break;
+case Movie.CHILDREN:
+thisAmount+=1.5;
+if (each.daysRented() > 3) thisAmount+=(each.daysRented() - 3) * 1.5;
+break;
 }
+totalAmount+=thisAmount;
+frequentRenterPoints++;
+if ((each.getTape().getMovie().priceCode() == Movie.NEW_RELEASE) && each.daysRented() > 1) frequentRenterPoints++;
+}
+
+Skip negative refactoring: Tape
+Skip negative refactoring: Rental
 
 * Target class: Movie
     Source class LCOM before refactoring: 0.625
     Target class LCOM before refactoring: 0.95
     Source class LCOM after refactoring: 0.625
-    Target class LCOM after refactoring: 0.96
-        LCOM reduction (improvement): 0.010000000000000009
+    Target class LCOM after refactoring: 0.875
+        LCOM reduction (improvement): -0.07499999999999996
 
-* Target class: Registrar
-    Source class LCOM before refactoring: 0.625
-    Target class LCOM before refactoring: 0.625
-    Source class LCOM after refactoring: 0.625
-    Target class LCOM after refactoring: 0.7
-        LCOM reduction (improvement): 0.07499999999999996
+Skip negative refactoring: Registrar
 
-* Target class: Rental
-    Source class LCOM before refactoring: 0.625
-    Target class LCOM before refactoring: 0.5
-    Source class LCOM after refactoring: 0.625
-    Target class LCOM after refactoring: 0.6666666666666666
-        LCOM reduction (improvement): 0.16666666666666652
-
-* Target class: Tape
-    Source class LCOM before refactoring: 0.625
-    Target class LCOM before refactoring: 0.5
-    Source class LCOM after refactoring: 0.625
-    Target class LCOM after refactoring: 0.75
-        LCOM reduction (improvement): 0.25
-
-*** Best Target Class: Tape
+*** Best Target Class: Movie
 ```
 
 ### ComplexClass
 
 ```text
 ===== Extracted Method =====
-public String concatenatePath(ArchiveFileSet afs,String name){
-  String pr=afs.getPref(getProj());
-  if (!pr.endsWith("/") && !pr.endsWith("\\")) {
-    pr+="/";
+
+public void getFullPath(Resource[] rcs,int i,String name,int j){
+  ArchiveFileSet afs=(ArchiveFileSet)rcs[i];
+  if (!"".equals(afs.getFullPath(getProj()))) {
+    name=afs.getFullPath(getProj());
   }
-  name=pr + name;
+ else   if (!"".equals(afs.getPref(getProj()))) {
+    String pr=afs.getPref(getProj());
+    if (!pr.endsWith("/") && !pr.endsWith("\\")) {
+      pr+="/";
+    }
+    name=pr + name;
+  }
 }
 
-* Target class: ArchiveFileSet
-    Source class LCOM before refactoring: 1.0
-    Target class LCOM before refactoring: 0.0
-    Source class LCOM after refactoring: 1.3333333333333333
-    Target class LCOM after refactoring: 0.0
-        LCOM reduction (improvement): 0.33333333333333326
+* Source class: ComplexClass
+    Source class CC before refactoring: 
+    {   paper.example.ComplexClass.grabNonFileSetRes=1.0, 
+        paper.example.ComplexClass.grabRes=1.0,
+        paper.example.ComplexClass.getProj=1.0,
+        paper.example.ComplexClass.gradManifests=12.0   }
 
-* Target class: FileSet
-    Source class LCOM before refactoring: 1.0
-    Target class LCOM before refactoring: 0.0
-    Source class LCOM after refactoring: 1.3333333333333333
-    Target class LCOM after refactoring: 1.5
-        LCOM reduction (improvement): 1.833333333333333
-
-* Target class: Resource
-    Source class LCOM before refactoring: 1.0
-    Target class LCOM before refactoring: 0.0
-    Source class LCOM after refactoring: 1.3333333333333333
-    Target class LCOM after refactoring: 1.0
-        LCOM reduction (improvement): 1.333333333333333
-
-*** Best Target Class: FileSet
+    Source class CC after refactoring:
+    {   paper.example.ComplexClass.getFullPath=5.0, 
+        paper.example.ComplexClass.grabNonFileSetRes=1.0, 
+        paper.example.ComplexClass.grabRes=1.0,
+        paper.example.ComplexClass.getProj=1.0,
+        paper.example.ComplexClass.gradManifests=6.0    }
 ```
 
 # Step 7: Generate the output json

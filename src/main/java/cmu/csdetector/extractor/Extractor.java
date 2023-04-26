@@ -93,14 +93,10 @@ public class Extractor {
 
         // Step 2: Extract the opportunities for each step
         Set<List<Integer>> opportunitySet = new HashSet<>();
-        for (int step = 1; step < statementsTable.size(); step++) {
-            StepIterator stepIterator = new StepIterator(statementsTable, step);
-            while (stepIterator.hasNext()) {
-                List<List<Integer>> opportunities = stepIterator.next();
-                // add the opportunities whose length is greater than 1 to the map
-                opportunitySet.addAll(opportunities);
-            }
-        }
+        StepIterator stepIterator = new StepIterator(statementsTable);
+        opportunitySet.addAll(stepIterator.getAllOpportunities());
+
+
         if (this.DEBUG) {
             // pretty print the opportunities in ascii table
             System.out.println("===== Opportunities =====");
@@ -360,10 +356,25 @@ public class Extractor {
         HashSet<String> set = new HashSet<>(Arrays.asList("byte", "short", "char", "int", "long", "float", "double", "boolean", "void"));
 
         if(set.contains(typeString)){
+//            ast.ne
             PrimitiveType type = ast.newPrimitiveType(PrimitiveType.toCode(typeString));
             return type;
         }
+        else if (typeString.endsWith(">")){
+            int i = typeString.length() - 1;
+            while(typeString.charAt(i) != '<'){
+                i--;
+            }
 
+            String parameterizedTypeString = typeString.substring(0, i);
+            org.eclipse.jdt.core.dom.Type listType = ast.newSimpleType(ast.newName(parameterizedTypeString));
+            org.eclipse.jdt.core.dom.Type elementType = ast.newSimpleType(ast.newName(typeString.substring(i+1, typeString.length()-1)));
+            ParameterizedType parameterizedType = ast.newParameterizedType(listType);
+            parameterizedType.typeArguments().add(elementType);
+            return parameterizedType;
+
+
+        }
         return ast.newSimpleType(ast.newName(typeString));
     }
 

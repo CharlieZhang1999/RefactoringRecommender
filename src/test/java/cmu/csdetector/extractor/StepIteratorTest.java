@@ -28,15 +28,9 @@ class StepIteratorTest {
         SortedMap<Integer, Set<String>> statementsTable = visitor.getLineNumToStatementsTable(smellyTarget.getSourceFile().getCompilationUnit());
 
         // extract the opportunities
-        Set<List<Integer>> opportunitySet = new HashSet<>();
-        for (int step = 1; step < statementsTable.size(); step++) {
-            StepIterator stepIterator = new StepIterator(statementsTable, step);
-            while (stepIterator.hasNext()) {
-                List<List<Integer>> opportunities = stepIterator.next();
-                // add the opportunities whose length is greater than 1 to the map
-                opportunitySet.addAll(opportunities);
-            }
-        }
+        StepIterator stepIterator = new StepIterator(statementsTable);
+        Set<List<Integer>> opportunitySet = stepIterator.getAllOpportunities();
+
 
         // check the opportunities
         assertTrue(opportunitySet.size() > 0);
