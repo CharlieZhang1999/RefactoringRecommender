@@ -340,7 +340,7 @@ public class ExtractedMethod {
     }
 
     public void setExtractedMethodParameters(List<SingleVariableDeclaration> parameters) {
-        this.parameters = parameters.stream().map(param -> param.getName().getIdentifier()).collect(Collectors.toList());
+        this.parameters = parameters.stream().map(param -> param.getType().toString() + " " + param.getName().getIdentifier()).collect(Collectors.toList());
         this.extractedMethodDeclaration.parameters().addAll(parameters);
     }
 
